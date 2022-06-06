@@ -12,21 +12,28 @@ router.route('/')
     .catch(console.dir);
 })
 .get((req, res) => {
-    find(req.params).then(data => res.json(data))
+    find(req.params).then(data => res.json(data));
+})
+.put((req, res) => {
+    update(req.body.id, req.body).then(() => res.status(200));
+})
+.delete((req, res) => {
+    deleteQuestion(req.body.id).then(() => res.status(200));
 })
 
+// 登録
 async function register(data) {
     try {
         // console.log(req.body)
         await client.connect();
         const database = client.db("fullstack");
-        const question = database.collection("questions");
+        const questions = database.collection("questions");
 
         const doc = {
             ...data
         }
 
-        const result = await question.insertOne(doc);
+        const result = await questions.insertOne(doc);
 
         // console.log(result)
 
@@ -35,23 +42,76 @@ async function register(data) {
     }
 }
 
+// 検索
 async function find(params) {
-    await client.connect();
-    const database = client.db("fullstack");
-    const questions = database.collection("questions");
-    const query = {
-        ...params
-    }
-    const options = {
-        sort: { _id: 1},
-        projection: {_id: 1, category: 1, unit: 1, title: 1, type: 1},
-    }
+    try {
+        await client.connect();
+        const database = client.db("fullstack");
+        const questions = database.collection("questions");
+        const query = {
+            ...params
+        }
+        const options = {
+            sort: { _id: 1},
+            projection: {_id: 1, category: 1, unit: 1, title: 1, type: 1},
+        }
+        
+        const result = questions.find(query, options)
     
-    const result = questions.find(query, options)
+        // console.log(await result.toArray())
+    
+        return await result.toArray();
+    } finally {
+        await client.close();
+    }
+}
 
-    // console.log(await result.toArray())
+// 更新
+async function update(id, params) {
+    try {
 
-    return await result.toArray();
+        await client.connect();
+        const database = client.db("fullstack");
+        const questions = database.collection("questions");
+    
+        const filter = {
+            _id: id
+        }
+    
+        const options = { upsert: true };
+
+        const updateDoc = {
+            $set: {
+                ...params
+            },
+        };
+
+        const result = await questions.updateOne(filter, updateDoc, options);
+
+    } finally {
+        await client.close();
+    }
+}
+
+// 削除
+async function deleteQuestion(id) {
+    try {
+        await client.connect();
+        const database = client.db("fullstack");
+        const questions = database.collection("questions");
+
+        const query = { _id: id };
+
+        const result = await questions.deleteOne(query);
+        if (result.deletedCount === 1) {
+            console.log("Successfully deleted one document.");
+        } else {
+            console.log("No documents matched the query. Deleted 0 documents.");
+        }
+
+    } finally {
+        await client.close();
+    }
 }
 
 module.exports = router
