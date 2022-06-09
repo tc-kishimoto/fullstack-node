@@ -1,6 +1,6 @@
 'use strict'
 const express = require('express')
-const { MongoClient } = require('mongodb')
+const { MongoClient, ObjectId } = require('mongodb')
 require('dotenv').config()
 
 const router = express.Router()
@@ -12,7 +12,10 @@ router.route('/')
     .catch(console.dir);
 })
 .get((req, res) => {
-    find(req.params).then(data => res.json(data));
+    find(req.query).then(data => {
+        console.log(data)
+        res.json(data)
+    });
 })
 .put((req, res) => {
     update(req.body.id, req.body).then(() => res.status(200));
@@ -45,22 +48,27 @@ async function register(data) {
 // 検索
 async function find(params) {
     try {
+        console.log(params)
         await client.connect();
         const database = client.db("fullstack");
         const questions = database.collection("questions");
-        const query = {
-            ...params
-        }
+        let query;
+        let result;
         const options = {
             sort: { _id: 1},
-            projection: {_id: 1, category: 1, unit: 1, title: 1, type: 1},
+            projection: { _id: 1, category: 1, unit: 1, title: 1, type: 1},
+        }
+        if('id' in params) {
+            query = { _id: ObjectId(params.id)}
+            return await questions.findOne(query, options) 
+        } else {
+            query = { ...params }
+            result = questions.find(query, options)
+            return await result.toArray()
         }
         
-        const result = questions.find(query, options)
-    
         // console.log(await result.toArray())
     
-        return await result.toArray();
     } finally {
         await client.close();
     }
