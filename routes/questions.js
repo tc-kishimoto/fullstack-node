@@ -56,7 +56,16 @@ async function find(params) {
         let result;
         const options = {
             sort: { _id: 1},
-            projection: { _id: 1, category: 1, unit: 1, title: 1, type: 1},
+            projection: { 
+                _id: 1, 
+                category: 1, 
+                unit: 1, 
+                title: 1, 
+                type: 1,
+                text: 1,
+                commentary: 1,
+                answer: 1,
+            },
         }
         if('id' in params) {
             query = { _id: ObjectId(params.id)}
