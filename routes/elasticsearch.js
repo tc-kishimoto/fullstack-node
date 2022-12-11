@@ -2,13 +2,7 @@
 const express = require('express')
 
 const { Client } = require('@elastic/elasticsearch')
-const client = new Client({
-  node: 'http://localhost:9200',
-  // auth: {
-  //   username: 'elastic',
-  //   password: 'changeme'
-  // }
-})
+const client = new Client({node: `http://${process.env.ES_HOST}:9200`})
 const router = express.Router()
 router.route('/')
 .get((req, res) => {
