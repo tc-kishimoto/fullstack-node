@@ -20,12 +20,26 @@ router.route('/')
       data: result
     }
     res.json(response)
-  });
+  }).catch(error => console.log(error));
+})
+.delete((req, res) => {
+  deleteIndex()
+  .then(data => res.json(data))
+  .catch(error => console.log(error));
+})
+.post((req, res) => {
+  create(req.body)
+  .then(data => res.json(data))
+  .catch(error => console.log(error));
+})
+.put((req, res) => {
+  update(req.body)
+  .then(data => res.json(data))
+  .catch(error => console.log(error));
 })
 
 // 検索
 async function find(params) {
-  console.log(params)
   const result = await client.search({
     index: 'fullstack',
     from: Number(params.size) * (Number(params.page) - 1),
@@ -39,6 +53,53 @@ async function find(params) {
     }
   })
   return result;
+}
+
+// 削除
+async function deleteIndex() {
+  // const result = await client.delete({index: 'fullstack'});
+  const result = await client.indices.flushSynced({index: 'fullstack'});
+  return result;
+}
+
+// 作成
+async function create(params) {
+  const result = await client.create({
+    index: 'fullstack',
+    id: params.id,
+    body: {
+      title: params.title,
+      category: params.category,
+      text: params.text,
+    }
+  });
+  return result;
+}
+
+// 更新
+async function update(params) {
+  const { body } = await client.exists({
+    index: 'fullstack',
+    id: params.id
+  })
+
+  if (body) {
+    await client.delete({
+      index: 'fullstack',
+      id: params.id
+    })
+
+  }
+  await client.create({
+    index: 'fullstack',
+    id: params.id,
+    body: {
+      title: params.title,
+      category: params.category,
+      text: params.text,
+    }
+  });
+  
 }
 
 module.exports = router
