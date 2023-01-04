@@ -15,5 +15,6 @@ app.use(function(req, res, next) {
 
 app.use('/api/questions', require('./routes/questions'))
 app.use('/api/elasticsearch', require('./routes/elasticsearch'))
+app.use('/api/daily', require('./routes/daily'))
 
 app.listen(process.env.LISTEN_PORT)
