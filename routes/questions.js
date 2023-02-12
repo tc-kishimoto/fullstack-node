@@ -27,7 +27,7 @@ router.route('/')
 // 登録
 async function register(data) {
     try {
-        // console.log(req.body)
+        // console.log(data)
         await client.connect();
         const database = client.db("fullstack");
         const questions = database.collection("questions");

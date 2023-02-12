@@ -12,19 +12,41 @@ router.route('/')
   .catch(console.dir);
 })
 
+// 検索
+async function find() {
+  try {
+    await client.connect();
+    const database = client.db("fullstack");
+    const daily = database.collection("daily");
+
+    const query = {
+      _id: id,
+    };
+
+    const options = {
+      projection: {
+        _id: 1,
+        date: 1,
+      }
+    }
+
+  } finally {
+    await client.close();
+  }
+}
+
 // 登録
 async function register(data) {
   try {
-      console.log(data);
       await client.connect();
       const database = client.db("fullstack");
-      const questions = database.collection("daily");
+      const daily = database.collection("daily");
 
       const doc = {
           ...data
       }
 
-      const result = await questions.insertOne(doc);
+      const result = await daily.insertOne(doc);
 
   } finally {
       await client.close();
