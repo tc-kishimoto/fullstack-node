@@ -17,46 +17,78 @@ router.route('/:userId/:year/:month')
 })
 
 router.route('/download/:userId/:year/:month')
-.get((req, res) => {
-  const data = find(req.params);
+.get(async (req, res) => {
+  const dailies = await find(req.params);
   const workbook = new ExcelJS.Workbook();
   workbook.xlsx.readFile(path.join(__dirname, '../template/daily.xlsx'))
   .then(() => {
     // 既存のシートをコピーして新しいシートを作成する
     const worksheet = workbook.getWorksheet('原紙');
-    const newSheet = workbook.addWorksheet('2月13日');
-    worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
-      // 既存のシートのデータを新しいシートにコピーする
-      const newRow = newSheet.getRow(rowNumber);
-      let isMerged = false;
-      row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-        if(isMerged) {
-          return false
-        }
-        const newCell = newRow.getCell(colNumber);
-        newCell.value = cell.value;
-        newCell.style = cell.style;
 
-        if (cell.isMerged) {
-          newSheet.mergeCells(
-            rowNumber,
-            colNumber,
-            rowNumber,
-            6
-          );
-          
-          isMerged = true;
-        }
+    for (const daily of dailies) {
+      // 年月日に分割する
+      const [year, month, day] = daily.date.split('-');
+      const newSheet = workbook.addWorksheet(`${month}月${day}日`);
+      worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
+        // 既存のシートのデータを新しいシートにコピーする
+        const newRow = newSheet.getRow(rowNumber);
+        let isMerged = false;
+        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+          if(isMerged) {
+            return false
+          }
+          const newCell = newRow.getCell(colNumber);
+          newCell.value = cell.value;
+          newCell.style = cell.style;
+  
+          // 各項目の見出し
+          if (cell.isMerged) {
+            newSheet.mergeCells(
+              rowNumber,
+              colNumber,
+              rowNumber,
+              6
+            );
+            
+            isMerged = true;
+          }
+        });
+  
+        // set row height
+        newRow.height = worksheet.getRow(rowNumber).height;
+  
+      });
+      // set column widths
+      worksheet.columns.forEach((column, index) => {
+        newSheet.getColumn(index + 1).width = column.width;
       });
 
-      // set row height
-      newRow.height = worksheet.getRow(rowNumber).height;
+      // 各データをセット
+      // 基本情報
+      newSheet.getCell('B6').value = daily.date;
+      // ビジネスマナー
+      newSheet.getCell('B10').value = daily.manner1;
+      newSheet.getCell('C10').value = daily.manner2;
+      newSheet.getCell('D10').value = daily.manner3;
+      newSheet.getCell('E10').value = daily.manner4;
 
-    });
-    // set column widths
-    worksheet.columns.forEach((column, index) => {
-      newSheet.getColumn(index + 1).width = column.width;
-    });
+      // スピーチ・ディスカッション
+      newSheet.getCell('B14').value = daily.speech_theme;
+      newSheet.getCell('C14').value = daily.speech_task;
+      newSheet.getCell('D14').value = daily.speech_notice;
+      newSheet.getCell('E14').value = daily.speech_solution;
+
+      // 研修内容
+      newSheet.getCell('B18').value = daily.main_overview;
+      newSheet.getCell('C18').value = daily.main_achievement;
+      newSheet.getCell('D18').value = daily.main_review;
+      newSheet.getCell('E18').value = daily.main_review_cause;
+      newSheet.getCell('F18').value = daily.main_solution;
+
+      // 自由記述
+      newSheet.getCell('B25').value = daily.free_description;
+
+    }
 
     workbook.xlsx.writeFile('sample.xlsx')
     .then(() => {
@@ -88,6 +120,20 @@ async function find(params) {
         _id: 1, 
         user_id: 1,
         date: 1,
+        manner1: 1,
+        manner2: 1,
+        manner3: 1,
+        manner4: 1,
+        speech_theme: 1,
+        speech_task: 1,
+        speech_notice: 1,
+        speech_solution: 1,
+        main_overview: 1,
+        main_achievement: 1,
+        main_review: 1,
+        main_review_cause: 1,
+        main_solution: 1,
+        free_description: 1,
       },
     }
 
