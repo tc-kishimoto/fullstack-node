@@ -16,6 +16,7 @@ router.route('/:userId/:year/:month')
   });
 })
 
+// Excelダウンロード
 router.route('/download/:userId/:year/:month')
 .get(async (req, res) => {
   const dailies = await find(req.params);
@@ -28,7 +29,18 @@ router.route('/download/:userId/:year/:month')
     for (const daily of dailies) {
       // 年月日に分割する
       const [year, month, day] = daily.date.split('-');
-      const newSheet = workbook.addWorksheet(`${month}月${day}日`);
+      // シート名重複対応
+      let sheetName = `${month}月${day}日`;
+      let count = 0;
+      while(true) {
+        if (workbook.worksheets.some(worksheet => worksheet.name === sheetName)) {
+          count++;
+          sheetName = `${sheetName}(${count})`;
+        } else {
+          break;
+        }
+      }
+      const newSheet = workbook.addWorksheet(sheetName);
       worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
         // 既存のシートのデータを新しいシートにコピーする
         const newRow = newSheet.getRow(rowNumber);
@@ -90,15 +102,15 @@ router.route('/download/:userId/:year/:month')
 
     }
 
-    workbook.xlsx.writeFile('sample.xlsx')
+    workbook.xlsx.writeFile(`daily-${req.params.userId}.xlsx`)
     .then(() => {
       // Excelファイルをレスポンスする
-      res.download('sample.xlsx', 'sample.xlsx', (error) => {
+      res.download(`daily-${req.params.userId}.xlsx`, `daily-${req.params.userId}.xlsx`, (error) => {
         if (error) {
           console.error(error);
         }
         // ファイルを削除する
-        fs.unlinkSync('sample.xlsx');
+        fs.unlinkSync(`daily-${req.params.userId}.xlsx`);
       });
     })
   })
@@ -115,7 +127,7 @@ async function find(params) {
       date: { $regex: new RegExp('^' + `${params.year}-${params.month}`)},
     };
     const options = {
-      sort: { _id: 1},
+      sort: { date: 1},
       projection: { 
         _id: 1, 
         user_id: 1,
