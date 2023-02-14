@@ -100,12 +100,12 @@ async function update(id, data) {
 
     const updateDoc = {
       $set: {
-        daily_type: 1,
+        daily_type: data.daily_type,
         manner1: data.manner1,
         manner2: data.manner2,
         manner3: data.manner3,
         manner4: data.manner4,
-        speech_or_discussion: 1,
+        speech_or_discussion: data.speech_or_discussion,
         speech_theme: data.speech_theme,
         speech_task: data.speech_task,
         speech_notice: data.speech_notice,
@@ -116,6 +116,7 @@ async function update(id, data) {
         main_review_cause: data.main_review_cause,
         main_solution: data.main_solution,
         free_description: data.free_description,
+        draft: data.draft,
       },
     };
 
