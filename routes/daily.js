@@ -39,10 +39,12 @@ async function find(id) {
         _id: 1, 
         user_id: 1,
         date: 1,
+        daily_type: 1,
         manner1: 1,
         manner2: 1,
         manner3: 1,
         manner4: 1,
+        speech_or_discussion: 1,
         speech_theme: 1,
         speech_task: 1,
         speech_notice: 1,
@@ -93,10 +95,12 @@ async function update(id, data) {
 
     const updateDoc = {
       $set: {
+        daily_type: 1,
         manner1: data.manner1,
         manner2: data.manner2,
         manner3: data.manner3,
         manner4: data.manner4,
+        speech_or_discussion: 1,
         speech_theme: data.speech_theme,
         speech_task: data.speech_task,
         speech_notice: data.speech_notice,
