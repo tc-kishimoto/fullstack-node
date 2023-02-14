@@ -8,7 +8,10 @@ const client = new MongoClient(process.env.MONGODB_URI);
 
 router.route('/')
 .post((req, res) => {
-  register(req.body).then(() => res.status(200).send('OK'))
+  register(req.body).then((data) => {
+    res.json(data)
+    // res.status(200).send('OK')
+})
   .catch(console.dir);
 })
 
@@ -77,6 +80,8 @@ async function register(data) {
       }
 
       const result = await daily.insertOne(doc);
+
+      return result;
 
   } finally {
       await client.close();
