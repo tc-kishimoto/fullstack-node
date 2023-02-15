@@ -46,6 +46,7 @@ async function find(id) {
         _id: 1, 
         user_id: 1,
         date: 1,
+        course_name: 1,
         daily_type: 1,
         manner1: 1,
         manner2: 1,
@@ -61,6 +62,12 @@ async function find(id) {
         main_review: 1,
         main_review_cause: 1,
         main_solution: 1,
+        test_category: 1,
+        test_taraget: 1,
+        score: 1,
+        passing_score: 1,
+        average_score: 1,
+        max_score: 1,
         free_description: 1,
       }
     }
@@ -105,6 +112,7 @@ async function update(id, data) {
     const updateDoc = {
       $set: {
         daily_type: data.daily_type,
+        course_name: data.course_name,
         manner1: data.manner1,
         manner2: data.manner2,
         manner3: data.manner3,
@@ -119,6 +127,12 @@ async function update(id, data) {
         main_review: data.main_review,
         main_review_cause: data.main_review_cause,
         main_solution: data.main_solution,
+        test_category: data.test_category,
+        test_taraget: data.test_taraget,
+        score: data.score,
+        passing_score: data.passing_score,
+        average_score: data.average_score,
+        max_score: data.max_score,
         free_description: data.free_description,
         draft: data.draft,
       },
