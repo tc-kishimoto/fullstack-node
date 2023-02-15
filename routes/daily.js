@@ -25,6 +25,10 @@ router.route('/:id')
   update(req.params.id, req.body).then(() => res.status(200).send('OK'))
   .catch(console.dir);
 })
+.delete((req, res) => {
+  deleteDaily(req.params.id).then(() => res.status(200).send('OK'))
+  .catch(console.dir);
+})
 
 // 検索
 async function find(id) {
@@ -117,6 +121,29 @@ async function update(id, data) {
         main_solution: data.main_solution,
         free_description: data.free_description,
         draft: data.draft,
+      },
+    };
+
+    const result = await daily.updateOne(filter, updateDoc, options);
+
+  } finally {
+      await client.close();
+  }
+}
+
+// 削除
+async function deleteDaily(id) {
+  try {
+    await client.connect();
+    const database = client.db("fullstack");
+    const daily = database.collection("daily");
+
+    const filter = { _id: ObjectId(id) };
+    const options = { upsert: false };
+
+    const updateDoc = {
+      $set: {
+        deleted_at: new Date()
       },
     };
 
