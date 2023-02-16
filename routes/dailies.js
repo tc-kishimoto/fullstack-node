@@ -23,10 +23,16 @@ router.route('/download/:userId/:year/:month')
   const workbook = new ExcelJS.Workbook();
   workbook.xlsx.readFile(path.join(__dirname, '../template/daily.xlsx'))
   .then(() => {
-    // 既存のシートをコピーして新しいシートを作成する
-    const worksheet = workbook.getWorksheet('原紙');
-
     for (const daily of dailies) {
+      // 原紙の取得
+      let templateSheetName = '原紙(通常)';
+      if (daily.daily_type === 'personal_develop') {
+        templateSheetName = '原紙(個人開発)';
+      } else if(daily.daily_type === 'team_develop') {
+        templateSheetName = '原紙(チーム開発)';
+      }
+      const worksheet = workbook.getWorksheet(templateSheetName);
+
       // 年月日に分割する
       const [year, month, day] = daily.date.split('-');
       // シート名重複対応
@@ -35,12 +41,20 @@ router.route('/download/:userId/:year/:month')
       while(true) {
         if (workbook.worksheets.some(worksheet => worksheet.name === sheetName)) {
           count++;
-          sheetName = `${sheetName}(${count})`;
+          sheetName = `${month}月${day}日(${count})`;
         } else {
           break;
         }
       }
-      const newSheet = workbook.addWorksheet(sheetName);
+
+      let newSheet = null;
+      if (workbook.worksheets.some(worksheet => worksheet.name === 'Sheet1')) {
+        newSheet = workbook.getWorksheet('Sheet1');
+        newSheet.name = sheetName;
+      } else {
+        newSheet = workbook.addWorksheet(sheetName);
+      }
+
       worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
         // 既存のシートのデータを新しいシートにコピーする
         const newRow = newSheet.getRow(rowNumber);
@@ -101,7 +115,11 @@ router.route('/download/:userId/:year/:month')
       newSheet.getCell('B25').value = daily.free_description;
 
     }
-
+    
+    workbook.getWorksheet("原紙(通常)").state = 'hidden';
+    workbook.getWorksheet("原紙(個人開発)").state = 'hidden';
+    workbook.getWorksheet("原紙(チーム開発)").state = 'hidden';
+    
     workbook.xlsx.writeFile(`daily-${req.params.userId}.xlsx`)
     .then(() => {
       // Excelファイルをレスポンスする
@@ -129,7 +147,7 @@ async function find(params) {
       deleted_at: { $exists: false},
     };
     const options = {
-      sort: { date: 1},
+      sort: { date: -1},
       projection: { 
         _id: 1, 
         user_id: 1,
