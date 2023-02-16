@@ -124,7 +124,8 @@ async function find(params) {
 
     const query = {
       user_id: Number(params.userId),
-      date: { $regex: new RegExp('^' + `${params.year}-${params.month}`)},
+      year: Number(params.year),
+      month: Number(params.month),
       deleted_at: { $exists: false},
     };
     const options = {

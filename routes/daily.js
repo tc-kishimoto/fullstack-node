@@ -6,6 +6,10 @@ require('dotenv').config()
 const router = express.Router()
 const client = new MongoClient(process.env.MONGODB_URI);
 
+const formatDate = (date) => {
+  return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`
+}
+
 router.route('/')
 .post((req, res) => {
   register(req.body).then((data) => {
@@ -28,6 +32,13 @@ router.route('/:id')
 .delete((req, res) => {
   deleteDaily(req.params.id).then(() => res.status(200).send('OK'))
   .catch(console.dir);
+})
+
+router.route('/copy/:id')
+.post((req, res) => {
+  copy(req.params.id).then(data => {
+    res.json(data)
+  })
 })
 
 // 検索
@@ -69,11 +80,13 @@ async function find(id) {
         average_score: 1,
         max_score: 1,
         free_description: 1,
+        draft: 1,
       }
     }
 
     return await daily.findOne(query, options);
-
+  } catch(error) {
+    console.log(error);
   } finally {
     await client.close();
   }
@@ -93,7 +106,8 @@ async function register(data) {
       const result = await daily.insertOne(doc);
 
       return result;
-
+  } catch(error) {
+    console.log(error);
   } finally {
       await client.close();
   }
@@ -139,7 +153,8 @@ async function update(id, data) {
     };
 
     const result = await daily.updateOne(filter, updateDoc, options);
-
+  } catch(error) {
+    console.log(error);
   } finally {
       await client.close();
   }
@@ -162,10 +177,26 @@ async function deleteDaily(id) {
     };
 
     const result = await daily.updateOne(filter, updateDoc, options);
-
+  } catch(error) {
+      console.log(error);
   } finally {
       await client.close();
   }
+}
+
+// コピー
+async function copy(id) {
+  const daily = await find(id);
+
+  delete daily._id;
+  const today = new Date();
+  daily.date = formatDate(today);
+  daily.year = today.getFullYear();
+  daily.month = today.getMonth() + 1;
+  daily.day = today.getDate();
+
+  return register(daily);
+
 }
 
 module.exports = router
