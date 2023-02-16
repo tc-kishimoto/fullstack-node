@@ -57,6 +57,9 @@ async function find(id) {
         _id: 1, 
         user_id: 1,
         date: 1,
+        year: 1,
+        month: 1,
+        day: 1,
         course_name: 1,
         daily_type: 1,
         manner1: 1,
@@ -125,6 +128,10 @@ async function update(id, data) {
 
     const updateDoc = {
       $set: {
+        date: data.date,
+        year: data.year,
+        month: data.month,
+        day: data.day,
         daily_type: data.daily_type,
         course_name: data.course_name,
         manner1: data.manner1,
