@@ -61,6 +61,9 @@ async function find(id) {
         month: 1,
         day: 1,
         course_name: 1,
+        name: 1,
+        company_name: 1,
+        class_name: 1,
         daily_type: 1,
         manner1: 1,
         manner2: 1,
@@ -82,6 +85,22 @@ async function find(id) {
         passing_score: 1,
         average_score: 1,
         max_score: 1,
+        personal_develop_theme: 1,
+        personal_develop_today_progress: 1,
+        personal_develop_overall_progress: 1,
+        personal_develop_planned_progress: 1,
+        personal_develop_link: 1,
+        personal_develop_work_content: 1,
+        personal_develop_task: 1,
+        personal_develop_solusion: 1,
+        team_develop_theme: 1,
+        team_develop_today_progress: 1,
+        team_develop_overall_progress: 1,
+        team_develop_planned_progress: 1,
+        team_develop_link: 1,
+        team_develop_work_content: 1,
+        team_develop_task: 1,
+        team_develop_solusion: 1,
         free_description: 1,
         draft: 1,
       }
@@ -102,8 +121,10 @@ async function register(data) {
       const database = client.db("fullstack");
       const daily = database.collection("daily");
 
+      const now = new Date();
+
       const doc = {
-          ...data
+        ...data, created_at: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
       }
 
       const result = await daily.insertOne(doc);
@@ -154,6 +175,22 @@ async function update(id, data) {
         passing_score: data.passing_score,
         average_score: data.average_score,
         max_score: data.max_score,
+        personal_develop_theme: data.personal_develop_theme,
+        personal_develop_today_progress: data.personal_develop_today_progress,
+        personal_develop_overall_progress: data.personal_develop_overall_progress,
+        personal_develop_planned_progress: data.personal_develop_planned_progress,
+        personal_develop_link: data.personal_develop_link,
+        personal_develop_work_content: data.personal_develop_work_content,
+        personal_develop_task: data.personal_develop_task,
+        personal_develop_solusion: data.personal_develop_solusion,
+        team_develop_theme: data.team_develop_theme,
+        team_develop_today_progress: data.team_develop_today_progress,
+        team_develop_overall_progress: data.team_develop_overall_progress,
+        team_develop_planned_progress: data.team_develop_planned_progress,
+        team_develop_link: data.team_develop_link,
+        team_develop_work_content: data.team_develop_work_content,
+        team_develop_task: data.team_develop_task,
+        team_develop_solusion: data.team_develop_solusion,
         free_description: data.free_description,
         draft: data.draft,
       },

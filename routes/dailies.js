@@ -21,6 +21,17 @@ router.route('/download/:userId/:year/:month')
 .get(async (req, res) => {
   const dailies = await find(req.params);
   const workbook = new ExcelJS.Workbook();
+
+  const noDataStyle = { 
+    alignment: { horizontal: 'center', vertical: 'middle'},
+    border: {
+      left: {style: 'thin', color: {argb: 'FF000000'}},
+      right: {style: 'thin', color: {argb: 'FF000000'}},
+      top: {style: 'thin', color: {argb: 'FF000000'}},
+      bottom: {style: 'thin', color: {argb: 'FF000000'}},
+    }
+  };
+
   workbook.xlsx.readFile(path.join(__dirname, '../template/daily.xlsx'))
   .then(() => {
     for (const daily of dailies) {
@@ -92,6 +103,11 @@ router.route('/download/:userId/:year/:month')
       // 各データをセット
       // 基本情報
       newSheet.getCell('B6').value = daily.date;
+      newSheet.getCell('C6').value = daily.course_name;
+      newSheet.getCell('D6').value = daily.company_name;
+      newSheet.getCell('E6').value = daily.name;
+      newSheet.getCell('F6').value = daily.class_name;
+
       // ビジネスマナー
       newSheet.getCell('B10').value = daily.manner1;
       newSheet.getCell('C10').value = daily.manner2;
@@ -99,17 +115,82 @@ router.route('/download/:userId/:year/:month')
       newSheet.getCell('E10').value = daily.manner4;
 
       // スピーチ・ディスカッション
-      newSheet.getCell('B14').value = daily.speech_theme;
-      newSheet.getCell('C14').value = daily.speech_task;
-      newSheet.getCell('D14').value = daily.speech_notice;
-      newSheet.getCell('E14').value = daily.speech_solution;
+      if (daily.speech_or_discussion === 'none') {
+        // newSheet.getCell('B14').alignment = { horizontal: 'center', vertical: 'middle'};
+        newSheet.getCell('B14').style = noDataStyle;
+        newSheet.getCell('B14').value = '-';
+        newSheet.getCell('C14').style = noDataStyle;
+        newSheet.getCell('C14').value = '-';
+        newSheet.getCell('D14').style = noDataStyle;
+        newSheet.getCell('D14').value = '-';
+        newSheet.getCell('E14').style = noDataStyle;
+        newSheet.getCell('E14').value = '-';
+      } else {
+        newSheet.getCell('B14').value = daily.speech_theme;
+        newSheet.getCell('C14').value = daily.speech_task;
+        newSheet.getCell('D14').value = daily.speech_notice;
+        newSheet.getCell('E14').value = daily.speech_solution;
+        if (daily.speech_or_discussion === 'speech') {
+          newSheet.getCell('B12').value = 'スピーチ';
+        } else if (daily.speech_or_discussion === 'discussion') {
+          newSheet.getCell('B12').value = 'ディスカッション';
+        } 
+      }
 
-      // 研修内容
-      newSheet.getCell('B18').value = daily.main_overview;
-      newSheet.getCell('C18').value = daily.main_achievement;
-      newSheet.getCell('D18').value = daily.main_review;
-      newSheet.getCell('E18').value = daily.main_review_cause;
-      newSheet.getCell('F18').value = daily.main_solution;
+      if (daily.daily_type === 'personal_develop') {
+        newSheet.getCell('B18').value = daily.personal_develop_theme;
+        newSheet.getCell('C18').value = daily.personal_develop_today_progress;
+        newSheet.getCell('D18').value = daily.personal_develop_overall_progress;
+        newSheet.getCell('E18').value = daily.personal_develop_planned_progress;
+        newSheet.getCell('F18').value = daily.personal_develop_link;
+        newSheet.getCell('B20').value = daily.personal_develop_work_content;
+        newSheet.getCell('C20').value = daily.personal_develop_task;
+        newSheet.getCell('D20').value = daily.personal_develop_solusion;
+      } else if (daily.daily_type === 'team_develop') {
+        newSheet.getCell('B18').value = daily.team_develop_theme;
+        newSheet.getCell('C18').value = daily.team_develop_today_progress;
+        newSheet.getCell('D18').value = daily.team_develop_overall_progress;
+        newSheet.getCell('E18').value = daily.team_develop_planned_progress;
+        newSheet.getCell('F18').value = daily.team_develop_link;
+        newSheet.getCell('B20').value = daily.team_develop_work_content;
+        newSheet.getCell('C20').value = daily.team_develop_task;
+        newSheet.getCell('D20').value = daily.team_develop_solusion;
+      } else {
+        // 研修内容
+        newSheet.getCell('B18').value = daily.main_overview;
+        newSheet.getCell('C18').value = daily.main_achievement;
+        newSheet.getCell('D18').value = daily.main_review;
+        newSheet.getCell('E18').value = daily.main_review_cause;
+        newSheet.getCell('F18').value = daily.main_solution;
+  
+        // テスト結果
+        if(daily.test_category == 'none') {
+          newSheet.getCell('B22').value = '-';
+          newSheet.getCell('B22').style = noDataStyle;
+          newSheet.getCell('C22').value = '-';
+          newSheet.getCell('C22').style = noDataStyle;
+          newSheet.getCell('D22').value = '-';
+          newSheet.getCell('D22').style = noDataStyle;
+          newSheet.getCell('E22').value = '-';
+          newSheet.getCell('E22').style = noDataStyle;
+          newSheet.getCell('F22').value = '-';
+          newSheet.getCell('F22').style = noDataStyle;
+        } else {
+          if(daily.test_category === 'little_test') {
+            newSheet.getCell('B22').value = daily.test_taraget + '(小テスト)';
+            newSheet.getCell('E22').value = 8;
+            newSheet.getCell('F22').value = 10;
+          } else {
+            newSheet.getCell('B22').value = daily.test_taraget + '(単元末テスト)';
+            newSheet.getCell('E22').value = 80;
+            newSheet.getCell('F22').value = 100;
+          }
+          newSheet.getCell('C22').value = daily.score;
+          newSheet.getCell('D22').value = daily.average_score;
+          // newSheet.getCell('E22').value = daily.passing_score;
+          // newSheet.getCell('F22').value = daily.max_score;
+        }
+      }
 
       // 自由記述
       newSheet.getCell('B25').value = daily.free_description;
@@ -151,11 +232,17 @@ async function find(params) {
       projection: { 
         _id: 1, 
         user_id: 1,
+        course_name: 1,
+        daily_type: 1,
         date: 1,
+        name: 1,
+        company_name: 1,
+        class_name: 1,
         manner1: 1,
         manner2: 1,
         manner3: 1,
         manner4: 1,
+        speech_or_discussion: 1,
         speech_theme: 1,
         speech_task: 1,
         speech_notice: 1,
@@ -165,6 +252,28 @@ async function find(params) {
         main_review: 1,
         main_review_cause: 1,
         main_solution: 1,
+        test_category: 1,
+        test_taraget: 1,
+        score: 1,
+        passing_score: 1,
+        average_score: 1,
+        max_score: 1,
+        personal_develop_theme: 1,
+        personal_develop_today_progress: 1,
+        personal_develop_overall_progress: 1,
+        personal_develop_planned_progress: 1,
+        personal_develop_link: 1,
+        personal_develop_work_content: 1,
+        personal_develop_task: 1,
+        personal_develop_solusion: 1,
+        team_develop_theme: 1,
+        team_develop_today_progress: 1,
+        team_develop_overall_progress: 1,
+        team_develop_planned_progress: 1,
+        team_develop_link: 1,
+        team_develop_work_content: 1,
+        team_develop_task: 1,
+        team_develop_solusion: 1,
         free_description: 1,
       },
     }
