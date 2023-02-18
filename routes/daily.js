@@ -1,6 +1,7 @@
 'use strict'
 const express = require('express')
 const { MongoClient, ObjectId } = require('mongodb')
+const { v4: uuidv4 } = require('uuid');
 require('dotenv').config()
 
 const router = express.Router()
@@ -49,7 +50,7 @@ async function find(id) {
     const daily = database.collection("daily");
 
     const query = {
-      _id: ObjectId(id),
+      _id: id,
     };
 
     const options = {
@@ -122,9 +123,12 @@ async function register(data) {
       const daily = database.collection("daily");
 
       const now = new Date();
+      const uuid = uuidv4();
 
       const doc = {
-        ...data, created_at: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
+        ...data,
+        _id: uuidv4(),
+        created_at: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
       }
 
       const result = await daily.insertOne(doc);
@@ -144,7 +148,7 @@ async function update(id, data) {
     const database = client.db("fullstack");
     const daily = database.collection("daily");
 
-    const filter = { _id: ObjectId(id) };
+    const filter = { _id: id };
     const options = { upsert: true };
 
     const updateDoc = {
@@ -211,7 +215,7 @@ async function deleteDaily(id) {
     const database = client.db("fullstack");
     const daily = database.collection("daily");
 
-    const filter = { _id: ObjectId(id) };
+    const filter = { _id: id };
     const options = { upsert: false };
 
     const updateDoc = {
