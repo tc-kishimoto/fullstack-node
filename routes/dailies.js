@@ -4,6 +4,7 @@ const { MongoClient } = require('mongodb')
 const ExcelJS = require('exceljs');
 const fs = require('fs');
 const path = require('path');
+const findSubmissionByUserId = require('./submission').findByUserId
 require('dotenv').config()
 
 const router = express.Router()
@@ -22,6 +23,7 @@ router.route('/download/:userId/:year/:month')
   const dailies = await find(req.params);
   const testResult = await findTestResult(req.params);
   const workbook = new ExcelJS.Workbook();
+  const submissions = await findSubmissionByUserId(req.params.userId);
 
   const noDataStyle = { 
     alignment: { horizontal: 'center', vertical: 'middle'},
@@ -223,6 +225,14 @@ router.route('/download/:userId/:year/:month')
         actualResultSheet.getCell(`E${row}`).value = 80;
         actualResultSheet.getCell(`F${row}`).value = 100;
       }
+      row++;
+    })
+    row = startRow;
+    submissions.forEach(submission => {
+      actualResultSheet.getCell(`G${row}`).value = submission.category;
+      actualResultSheet.getCell(`H${row}`).value = submission.lesson_type;
+      actualResultSheet.getCell(`I${row}`).value = submission.lesson_name;
+      actualResultSheet.getCell(`J${row}`).value = submission.date;
       row++;
     })
 

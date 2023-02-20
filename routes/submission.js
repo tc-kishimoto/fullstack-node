@@ -1,6 +1,6 @@
 'use strict';
 const express = require('express')
-const { MongoClient, ObjectId } = require('mongodb')
+const { MongoClient } = require('mongodb')
 require('dotenv').config()
 
 const router = express.Router()
@@ -34,6 +34,7 @@ async function register(data) {
 
       const doc = {
         ...data,
+        date: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`,
         created_at: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
       }
 
@@ -58,7 +59,7 @@ async function findByUserId(userId) {
       deleted_at: { $exists: false},
     };
     const options = {
-      sort: { created_at: -1},
+      sort: { created_at: 1},
       projection: { 
         _id: 1, 
         user_id: 1,
@@ -67,6 +68,7 @@ async function findByUserId(userId) {
         lesson_name: 1,
         url: 1,
         comment: 1,
+        date: 1,
         created_at: 1,
       },
     }
@@ -78,5 +80,4 @@ async function findByUserId(userId) {
   }
 }
 
-
-module.exports = router
+module.exports = { router, findByUserId }
