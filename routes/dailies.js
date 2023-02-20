@@ -20,6 +20,7 @@ router.route('/:userId/:year/:month')
 router.route('/download/:userId/:year/:month')
 .get(async (req, res) => {
   const dailies = await find(req.params);
+  const testResult = await findTestResult(req.params);
   const workbook = new ExcelJS.Workbook();
 
   const noDataStyle = { 
@@ -200,7 +201,31 @@ router.route('/download/:userId/:year/:month')
     workbook.getWorksheet("原紙(通常)").state = 'hidden';
     workbook.getWorksheet("原紙(個人開発)").state = 'hidden';
     workbook.getWorksheet("原紙(チーム開発)").state = 'hidden';
-    
+
+    // 実績
+    const actualResultSheet = workbook.getWorksheet("実績管理表")
+    const startRow = 7;
+    let row = startRow;
+    testResult.forEach(daily => {
+      if (row > startRow) {
+        actualResultSheet.getRow(row).height = actualResultSheet.getRow(startRow).height
+        actualResultSheet.getRow(row).style = actualResultSheet.getRow(startRow).style
+      }
+      actualResultSheet.getCell(`A${row}`).value = daily.date;
+      actualResultSheet.getCell(`C${row}`).value = daily.score;
+      actualResultSheet.getCell(`D${row}`).value = daily.average_score;
+      if(daily.test_category === 'little_test') {
+        actualResultSheet.getCell(`B${row}`).value  = daily.test_taraget + '(小テスト)';
+        actualResultSheet.getCell(`E${row}`).value = 8;
+        actualResultSheet.getCell(`F${row}`).value = 10;
+      } else {
+        actualResultSheet.getCell(`B${row}`).value  = daily.test_taraget + '(単元末テスト)';
+        actualResultSheet.getCell(`E${row}`).value = 80;
+        actualResultSheet.getCell(`F${row}`).value = 100;
+      }
+      row++;
+    })
+
     workbook.xlsx.writeFile(`daily-${req.params.userId}.xlsx`)
     .then(() => {
       // Excelファイルをレスポンスする
@@ -215,6 +240,7 @@ router.route('/download/:userId/:year/:month')
   })
 })
 
+// カレンダー・Excel出力用
 async function find(params) {
   try {
     await client.connect();
@@ -275,6 +301,43 @@ async function find(params) {
         team_develop_task: 1,
         team_develop_solusion: 1,
         free_description: 1,
+      },
+    }
+
+    const result = await dailies.find(query, options).toArray();
+    return result;
+  } finally {
+      await client.close();
+  }
+}
+
+async function findTestResult(params) {
+  try {
+    await client.connect();
+    const database = client.db("fullstack");
+    const dailies = database.collection("daily");
+
+    const query = {
+      user_id: Number(params.userId),
+      year: Number(params.year),
+      month: Number(params.month),
+      deleted_at: { $exists: false},
+      test_category: { $ne: 'none' },
+    };
+    const options = {
+      sort: { date: 1},
+      projection: { 
+        _id: 1, 
+        user_id: 1,
+        course_name: 1,
+        date: 1,
+        name: 1,
+        test_category: 1,
+        test_taraget: 1,
+        score: 1,
+        passing_score: 1,
+        average_score: 1,
+        max_score: 1,
       },
     }
 
