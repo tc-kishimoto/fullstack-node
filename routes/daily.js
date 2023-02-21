@@ -1,6 +1,7 @@
 'use strict'
 const express = require('express')
-const { MongoClient, ObjectId } = require('mongodb')
+const { MongoClient } = require('mongodb')
+const common = require('../db/common');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config()
 
@@ -22,7 +23,9 @@ router.route('/')
 
 router.route('/:id')
 .get((req, res) => {
-  find(req.params.id).then(data => {
+  // find(req.params.id)
+  common.findById('daily', req.params.id)
+  .then(data => {
     res.json(data)
   })
 })
@@ -42,78 +45,6 @@ router.route('/copy/:id')
   })
 })
 
-// 検索
-async function find(id) {
-  try {
-    await client.connect();
-    const database = client.db("fullstack");
-    const daily = database.collection("daily");
-
-    const query = {
-      _id: id,
-    };
-
-    const options = {
-      projection: {
-        _id: 1, 
-        user_id: 1,
-        date: 1,
-        year: 1,
-        month: 1,
-        day: 1,
-        course_name: 1,
-        name: 1,
-        company_name: 1,
-        class_name: 1,
-        daily_type: 1,
-        manner1: 1,
-        manner2: 1,
-        manner3: 1,
-        manner4: 1,
-        speech_or_discussion: 1,
-        speech_theme: 1,
-        speech_task: 1,
-        speech_notice: 1,
-        speech_solution: 1,
-        main_overview: 1,
-        main_achievement: 1,
-        main_review: 1,
-        main_review_cause: 1,
-        main_solution: 1,
-        test_category: 1,
-        test_taraget: 1,
-        score: 1,
-        passing_score: 1,
-        average_score: 1,
-        max_score: 1,
-        personal_develop_theme: 1,
-        personal_develop_today_progress: 1,
-        personal_develop_overall_progress: 1,
-        personal_develop_planned_progress: 1,
-        personal_develop_link: 1,
-        personal_develop_work_content: 1,
-        personal_develop_task: 1,
-        personal_develop_solusion: 1,
-        team_develop_theme: 1,
-        team_develop_today_progress: 1,
-        team_develop_overall_progress: 1,
-        team_develop_planned_progress: 1,
-        team_develop_link: 1,
-        team_develop_work_content: 1,
-        team_develop_task: 1,
-        team_develop_solusion: 1,
-        free_description: 1,
-        draft: 1,
-      }
-    }
-
-    return await daily.findOne(query, options);
-  } catch(error) {
-    console.log(error);
-  } finally {
-    await client.close();
-  }
-}
 
 // 登録
 async function register(data) {
