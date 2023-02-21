@@ -52,4 +52,30 @@ const insertOne = async (collectionName, data) => {
   }
 }
 
-module.exports = { findById, insertOne }
+const deleteOne = async (collectionName, id) => {
+  try {
+    await client.connect();
+    const database = client.db(process.env.DATABASE_NAME);
+    const collection = database.collection(collectionName);
+
+    const filter = { _id: id };
+    const options = { upsert: false };
+
+    const now = new Date();
+
+    const updateDoc = {
+      $set: {
+        deleted_at: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
+      },
+    };
+
+    const result = await collection.updateOne(filter, updateDoc, options);
+    return result;
+  } catch(error) {
+    console.log(error);
+  } finally {
+    await client.close();
+  }
+}
+
+module.exports = { findById, insertOne, deleteOne }

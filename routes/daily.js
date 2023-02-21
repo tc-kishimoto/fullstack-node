@@ -5,6 +5,8 @@ const common = require('../db/common');
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config()
 
+const tableName = 'daily';
+
 const router = express.Router()
 const client = new MongoClient(process.env.MONGODB_URI);
 
@@ -16,7 +18,7 @@ router.route('/')
 .post((req, res) => {
   const body = req.body
   body._id = uuidv4();
-  common.insertOne('daily', body)
+  common.insertOne(tableName, body)
   .then((data) => {
     res.json(data)
 })
@@ -25,7 +27,7 @@ router.route('/')
 
 router.route('/:id')
 .get((req, res) => {
-  common.findById('daily', req.params.id)
+  common.findById(tableName, req.params.id)
   .then(data => {
     res.json(data)
   })
@@ -35,7 +37,8 @@ router.route('/:id')
   .catch(console.dir);
 })
 .delete((req, res) => {
-  deleteDaily(req.params.id).then(() => res.status(200).send('OK'))
+  common.deleteOne(tableName, req.params.id)
+    .then(() => res.status(200).send('OK'))
   .catch(console.dir);
 })
 
@@ -46,32 +49,6 @@ router.route('/copy/:id')
   })
 })
 
-
-// 登録
-async function register(data) {
-  try {
-      await client.connect();
-      const database = client.db("fullstack");
-      const daily = database.collection("daily");
-
-      const now = new Date();
-      const uuid = uuidv4();
-
-      const doc = {
-        ...data,
-        _id: uuidv4(),
-        created_at: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
-      }
-
-      const result = await daily.insertOne(doc);
-
-      return result;
-  } catch(error) {
-    console.log(error);
-  } finally {
-      await client.close();
-  }
-}
 
 // 更新
 async function update(id, data) {
@@ -140,33 +117,10 @@ async function update(id, data) {
   }
 }
 
-// 削除
-async function deleteDaily(id) {
-  try {
-    await client.connect();
-    const database = client.db("fullstack");
-    const daily = database.collection("daily");
-
-    const filter = { _id: id };
-    const options = { upsert: false };
-
-    const updateDoc = {
-      $set: {
-        deleted_at: new Date()
-      },
-    };
-
-    const result = await daily.updateOne(filter, updateDoc, options);
-  } catch(error) {
-      console.log(error);
-  } finally {
-      await client.close();
-  }
-}
 
 // コピー
 async function copy(id) {
-  const daily = await common.findById('daily', id)
+  const daily = await common.findById(tableName, id)
 
   delete daily._id;
   const today = new Date();
@@ -176,7 +130,7 @@ async function copy(id) {
   daily.day = today.getDate();
   daily._id = uuidv4();
 
-  const result = await common.insertOne('daily', daily);
+  const result = await common.insertOne(tableName, daily);
   return result;
 
 }
