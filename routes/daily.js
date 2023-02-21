@@ -14,16 +14,17 @@ const formatDate = (date) => {
 
 router.route('/')
 .post((req, res) => {
-  register(req.body).then((data) => {
+  const body = req.body
+  body._id = uuidv4();
+  common.insertOne('daily', body)
+  .then((data) => {
     res.json(data)
-    // res.status(200).send('OK')
 })
   .catch(console.dir);
 })
 
 router.route('/:id')
 .get((req, res) => {
-  // find(req.params.id)
   common.findById('daily', req.params.id)
   .then(data => {
     res.json(data)
@@ -165,7 +166,7 @@ async function deleteDaily(id) {
 
 // コピー
 async function copy(id) {
-  const daily = await find(id);
+  const daily = await common.findById('daily', id)
 
   delete daily._id;
   const today = new Date();
@@ -173,8 +174,10 @@ async function copy(id) {
   daily.year = today.getFullYear();
   daily.month = today.getMonth() + 1;
   daily.day = today.getDate();
+  daily._id = uuidv4();
 
-  return register(daily);
+  const result = await common.insertOne('daily', daily);
+  return result;
 
 }
 
