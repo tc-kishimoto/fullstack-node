@@ -46,6 +46,24 @@ const findOne = async (collectionName, filter) => {
   }
 }
 
+const find = async (collectionName, filter) => {
+  try {
+    await client.connect();
+    const database = client.db(process.env.DATABASE_NAME);
+    const collection = database.collection(collectionName);
+
+    const query = {
+      ...filter
+    };    
+    const result = await collection.find(query).toArray();
+    return result;
+  } catch(error) {
+    console.log(error);
+  } finally {
+    await client.close();
+  }
+}
+
 const insertOne = async (collectionName, data) => {
   try {
     await client.connect();
@@ -124,4 +142,4 @@ const updateOne = async (collectionName, id, data) => {
   }
 }
 
-module.exports = { findById, findOne, insertOne, deleteOne, updateOne }
+module.exports = { findById, findOne, find, insertOne, deleteOne, updateOne }
