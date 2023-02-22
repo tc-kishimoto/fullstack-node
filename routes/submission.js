@@ -33,7 +33,15 @@ router.route('/:userId')
 
 router.route('/:userId/:category/:lessonType/:lessonName')
 .get((req, res) => {
-  findOne(req.params).then((data) => {
+  const filter = 
+    {
+      user_id: Number(req.params.userId),
+      category: req.params.category,
+      lesson_type: req.params.lessonType,
+      lesson_name: req.params.lessonName,
+    };
+  common.findOne(collectionName, filter)
+  .then((data) => {
     res.json(data)
   })
   .catch(console.dir);
@@ -71,38 +79,5 @@ async function findByUserId(userId) {
   }
 }
 
-async function findOne(params) {
-  try {
-    await client.connect();
-    const database = client.db("fullstack");
-    const submission = database.collection("submission");
-
-    const query = {
-      user_id: Number(params.userId),
-      category: params.category,
-      lesson_type: params.lessonType,
-      lesson_name: params.lessonName,
-    };
-
-    const options = {
-      projection: {
-        _id: 1, 
-        user_id: 1,
-        category: 1,
-        lesson_type: 1,
-        lesson_name: 1,
-        url: 1,
-        comment: 1,
-      }
-    }
-
-    const result = await submission.findOne(query, options);
-    return result;
-  } catch(error) {
-    console.log(error);
-  } finally {
-    await client.close();
-  }
-}
 
 module.exports = { router, findByUserId }
