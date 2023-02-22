@@ -16,9 +16,13 @@ router.route('/')
   .catch(console.dir);
 })
 
-router.route('/id')
+router.route('/:id')
 .put((req, res) => {
-
+  common.updateOne(collectionName, req.params.id, req.body)
+  .then((data) => {
+    res.json(data)
+  })
+  .catch(console.dir);
 })
 
 router.route('/:userId')
