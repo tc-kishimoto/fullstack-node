@@ -12,7 +12,14 @@ const client = new MongoClient(process.env.MONGODB_URI);
 
 router.route('/:userId/:year/:month')
 .get((req, res) => {
-  find(req.params).then(data => {
+  const filter = {
+    user_id: Number(req.params.userId),
+    year: Number(req.params.year),
+    month: Number(req.params.month),
+    deleted_at: { $exists: false},
+  };
+  common.find('daily', filter)
+  .then(data => {
       res.json(data)
   });
 })
@@ -20,8 +27,30 @@ router.route('/:userId/:year/:month')
 // Excelダウンロード
 router.route('/download/:userId/:year/:month')
 .get(async (req, res) => {
-  const dailies = await find(req.params);
-  const testResult = await findTestResult(req.params);
+  const dailyFilter = {
+    user_id: Number(req.params.userId),
+    year: Number(req.params.year),
+    month: Number(req.params.month),
+    deleted_at: { $exists: false},
+  };
+  const dailyOptions = {
+    sort: { date: -1},
+  }
+  const dailies = await common.find('daily', dailyFilter, dailyOptions)
+
+  const testResultFilter = {
+    user_id: Number(req.params.userId),
+    year: Number(req.params.year),
+    month: Number(req.params.month),
+    deleted_at: { $exists: false},
+    test_category: { $ne: 'none' },
+  };
+  const testResultOptions = {
+    sort: { date: 1},
+  }
+  const testResult = await common.find('daily', testResultFilter, testResultOptions)
+  // const testResult = await findTestResult(req.params);
+
   const workbook = new ExcelJS.Workbook();
   const submissionFilter = {
     user_id: Number(req.params.userId),
@@ -254,112 +283,5 @@ router.route('/download/:userId/:year/:month')
   })
 })
 
-// カレンダー・Excel出力用
-async function find(params) {
-  try {
-    await client.connect();
-    const database = client.db("fullstack");
-    const dailies = database.collection("daily");
-
-    const query = {
-      user_id: Number(params.userId),
-      year: Number(params.year),
-      month: Number(params.month),
-      deleted_at: { $exists: false},
-    };
-    const options = {
-      sort: { date: -1},
-      projection: { 
-        _id: 1, 
-        user_id: 1,
-        course_name: 1,
-        daily_type: 1,
-        date: 1,
-        name: 1,
-        company_name: 1,
-        class_name: 1,
-        manner1: 1,
-        manner2: 1,
-        manner3: 1,
-        manner4: 1,
-        speech_or_discussion: 1,
-        speech_theme: 1,
-        speech_task: 1,
-        speech_notice: 1,
-        speech_solution: 1,
-        main_overview: 1,
-        main_achievement: 1,
-        main_review: 1,
-        main_review_cause: 1,
-        main_solution: 1,
-        test_category: 1,
-        test_taraget: 1,
-        score: 1,
-        passing_score: 1,
-        average_score: 1,
-        max_score: 1,
-        personal_develop_theme: 1,
-        personal_develop_today_progress: 1,
-        personal_develop_overall_progress: 1,
-        personal_develop_planned_progress: 1,
-        personal_develop_link: 1,
-        personal_develop_work_content: 1,
-        personal_develop_task: 1,
-        personal_develop_solusion: 1,
-        team_develop_theme: 1,
-        team_develop_today_progress: 1,
-        team_develop_overall_progress: 1,
-        team_develop_planned_progress: 1,
-        team_develop_link: 1,
-        team_develop_work_content: 1,
-        team_develop_task: 1,
-        team_develop_solusion: 1,
-        free_description: 1,
-      },
-    }
-
-    const result = await dailies.find(query, options).toArray();
-    return result;
-  } finally {
-      await client.close();
-  }
-}
-
-async function findTestResult(params) {
-  try {
-    await client.connect();
-    const database = client.db("fullstack");
-    const dailies = database.collection("daily");
-
-    const query = {
-      user_id: Number(params.userId),
-      year: Number(params.year),
-      month: Number(params.month),
-      deleted_at: { $exists: false},
-      test_category: { $ne: 'none' },
-    };
-    const options = {
-      sort: { date: 1},
-      projection: { 
-        _id: 1, 
-        user_id: 1,
-        course_name: 1,
-        date: 1,
-        name: 1,
-        test_category: 1,
-        test_taraget: 1,
-        score: 1,
-        passing_score: 1,
-        average_score: 1,
-        max_score: 1,
-      },
-    }
-
-    const result = await dailies.find(query, options).toArray();
-    return result;
-  } finally {
-      await client.close();
-  }
-}
 
 module.exports = router

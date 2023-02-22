@@ -46,7 +46,7 @@ const findOne = async (collectionName, filter) => {
   }
 }
 
-const find = async (collectionName, filter) => {
+const find = async (collectionName, filter, options) => {
   try {
     await client.connect();
     const database = client.db(process.env.DATABASE_NAME);
@@ -55,7 +55,14 @@ const find = async (collectionName, filter) => {
     const query = {
       ...filter
     };    
-    const result = await collection.find(query).toArray();
+
+    if (options === undefined) {
+      options = {
+        sort: { _id: 1},
+      }
+    }
+
+    const result = await collection.find(query, options).toArray();
     return result;
   } catch(error) {
     console.log(error);
