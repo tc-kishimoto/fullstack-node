@@ -2,12 +2,8 @@
 const { MongoClient } = require('mongodb')
 require('dotenv').config()
 
-// const connectToDatabase = async () => {
-//   const client = new MongoClient(process.env.MONGODB_URI);
-//   return client.db();
-// }
-
-const client = new MongoClient(process.env.MONGODB_URI);
+const uri = process.env.NODE_ENV === 'test' ? process.env.MONGODB_TEST_URI : process.env.MONGODB_URI;
+const client = new MongoClient(uri);
 
 const findById = async (collectionName, id) => {
   try {

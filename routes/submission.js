@@ -54,4 +54,4 @@ router.route('/:userId/:category/:lessonType/:lessonName')
   .catch(console.dir);
 })
 
-module.exports = { router }
+module.exports = router

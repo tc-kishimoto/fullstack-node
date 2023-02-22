@@ -15,4 +15,14 @@ app.use('/api/daily', require('./routes/daily'))
 app.use('/api/dailies', require('./routes/dailies'))
 app.use('/api/submission', require('./routes/submission'))
 
-app.listen(process.env.LISTEN_PORT)
+// test用DB起動
+const { MongoMemoryServer } = require('mongodb-memory-server');
+// const mongod = await MongoMemoryServer.create();
+MongoMemoryServer.create({ dbName: process.env.DATABASE_NAME}).then(mongod => {
+  const uri = mongod.getUri();
+  process.env.MONGODB_TEST_URI = uri
+  console.log(uri)
+});
+
+app.listen(process.env.LISTEN_TEST_PORT)
+
