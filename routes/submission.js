@@ -9,7 +9,11 @@ const collectionName = 'submission';
 
 router.route('/')
 .post((req, res) => {
-  common.insertOne(collectionName, req.body)
+  const now = new Date()
+  common.insertOne(collectionName, {
+    ...req.body,
+    date: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`,
+  })
   .then((data) => {
     res.json(data)
   })
