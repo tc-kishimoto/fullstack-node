@@ -17,12 +17,18 @@ app.use('/api/submission', require('./routes/submission'))
 
 // test用DB起動
 const { MongoMemoryServer } = require('mongodb-memory-server');
-// const mongod = await MongoMemoryServer.create();
-MongoMemoryServer.create({ dbName: process.env.DATABASE_NAME}).then(mongod => {
-  const uri = mongod.getUri();
-  process.env.MONGODB_TEST_URI = uri
-  console.log(uri)
-});
+const mongod = new MongoMemoryServer({ 
+  instance: {
+    port: Number(process.env.TEST_DB_PORT),
+    ip: process.env.TEST_DB_HOST,
+    dbName: process.env.DATABASE_NAME,
+  }
+})
+  mongod.start().then(() => {
+    const uri = mongod.getUri();
+    process.env.MONGODB_TEST_URI = uri
+    console.log(uri)
+  })
 
-app.listen(process.env.LISTEN_TEST_PORT)
+app.listen(process.env.LISTEN_PORT)
 
