@@ -20,6 +20,36 @@ router.route('/:userId/:year/:month')
   });
 })
 
+router.route('/company/:companyId')
+.get((req, res) => {
+  const filter = {
+    company_id: Number(req.params.companyId),
+    deleted_at: { $exists: false},
+  };
+  const options = {
+    sort: { date: -1},
+  }
+  common.find('daily', filter, options)
+  .then(data => {
+      res.json(data)
+  });
+})
+
+router.route('/course/:couseId')
+.get((req, res) => {
+  const filter = {
+    course_id: Number(req.params.couseId),
+    deleted_at: { $exists: false},
+  };
+  const options = {
+    sort: { date: -1},
+  }
+  common.find('daily', filter, options)
+  .then(data => {
+      res.json(data)
+  });
+})
+
 // Excelダウンロード
 router.route('/download/:userId/:year/:month')
 .get(async (req, res) => {
