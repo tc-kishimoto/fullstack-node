@@ -49,6 +49,32 @@ router.route('/user/:userId')
   .catch(console.dir);
 })
 
+router.route('/company/:companyId')
+.get((req, res) => {
+  const filter = {
+    company_id: Number(req.params.companyId),
+    deleted_at: { $exists: false},
+  }
+  common.find(collectionName, filter)
+  .then((data) => {
+    res.json(data)
+  })
+  .catch(console.dir);
+})
+
+router.route('/course/:courseId')
+.get((req, res) => {
+  const filter = {
+    course_id: Number(req.params.courseId),
+    deleted_at: { $exists: false},
+  }
+  common.find(collectionName, filter)
+  .then((data) => {
+    res.json(data)
+  })
+  .catch(console.dir);
+})
+
 router.route('/:userId/:category/:lessonType/:lessonName')
 .get((req, res) => {
   const filter = 
