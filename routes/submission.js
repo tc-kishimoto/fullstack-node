@@ -21,6 +21,13 @@ router.route('/')
 })
 
 router.route('/:id')
+.get((req, res) => {
+  common.findById(collectionName, req.params.id)
+  .then((data) => {
+    res.json(data)
+  })
+  .catch(console.dir);
+})
 .put((req, res) => {
   common.updateOne(collectionName, req.params.id, req.body)
   .then((data) => {
@@ -29,7 +36,7 @@ router.route('/:id')
   .catch(console.dir);
 })
 
-router.route('/:userId')
+router.route('/user/:userId')
 .get((req, res) => {
   const filter = {
     user_id: Number(req.params.userId),
