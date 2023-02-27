@@ -50,6 +50,21 @@ router.route('/course/:couseId')
   });
 })
 
+router.route('/user/:userId')
+.get((req, res) => {
+  const filter = {
+    user_id: Number(req.params.userId),
+    deleted_at: { $exists: false},
+  };
+  const options = {
+    sort: { date: -1},
+  }
+  common.find('daily', filter, options)
+  .then(data => {
+      res.json(data)
+  });
+})
+
 // Excelダウンロード
 router.route('/download/:userId/:year/:month')
 .get(async (req, res) => {
