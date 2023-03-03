@@ -229,7 +229,7 @@ const createActualResultSheet = async (workbook, params) => {
 // 日報データ取得
 const getDailies = async (params) => {
   const dailyFilter = {
-    user_id: Number(params.userId),
+    user_id: params.userId,
     year: Number(params.year),
     month: Number(params.month),
     deleted_at: { $exists: false},
@@ -243,7 +243,7 @@ const getDailies = async (params) => {
 // テスト結果取得
 const getTestResult = async (params) => {
   const testResultFilter = {
-    user_id: Number(params.userId),
+    user_id: params.userId,
     year: Number(params.year),
     month: Number(params.month),
     deleted_at: { $exists: false},
@@ -258,7 +258,7 @@ const getTestResult = async (params) => {
 // 演習提出状況取得
 const getSubmissions = async (params) => {
   const submissionFilter = {
-    user_id: Number(params.userId),
+    user_id: params.userId,
     deleted_at: { $exists: false},
   }
   return await common.find('submission', submissionFilter)

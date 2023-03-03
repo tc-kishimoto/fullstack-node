@@ -9,7 +9,7 @@ const router = express.Router()
 router.route('/:userId/:year/:month')
 .get((req, res) => {
   const filter = {
-    user_id: Number(req.params.userId),
+    user_id: req.params.userId,
     year: Number(req.params.year),
     month: Number(req.params.month),
     deleted_at: { $exists: false},
@@ -23,7 +23,7 @@ router.route('/:userId/:year/:month')
 router.route('/company/:companyId')
 .get((req, res) => {
   const filter = {
-    company_id: Number(req.params.companyId),
+    company_id: req.params.companyId,
     deleted_at: { $exists: false},
   };
   const options = {
@@ -38,7 +38,7 @@ router.route('/company/:companyId')
 router.route('/course/:couseId')
 .get((req, res) => {
   const filter = {
-    course_id: Number(req.params.couseId),
+    course_id: req.params.couseId,
     deleted_at: { $exists: false},
   };
   const options = {
@@ -53,7 +53,7 @@ router.route('/course/:couseId')
 router.route('/user/:userId')
 .get((req, res) => {
   const filter = {
-    user_id: Number(req.params.userId),
+    user_id: req.params.userId,
     deleted_at: { $exists: false},
   };
   const options = {
