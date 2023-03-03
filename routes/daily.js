@@ -45,6 +45,18 @@ router.route('/:id')
   .catch(console.dir);
 })
 
+router.route('/user/:userId/:id')
+.get((req, res) => {
+  common.findById(collectionName, req.params.id)
+  .then(data => {
+    if(data === null || req.params.userId !== data.user_id) {
+      res.status(404).send('404 Not Found')
+    } else {
+      res.json(data)
+    }
+  })
+})
+
 router.route('/copy/:id')
 .post((req, res) => {
   copy(req.params.id).then(data => {
