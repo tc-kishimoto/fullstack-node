@@ -39,7 +39,7 @@ router.route('/:id')
 router.route('/user/:userId')
 .get((req, res) => {
   const filter = {
-    user_id: Number(req.params.userId),
+    user_id: req.params.userId,
     deleted_at: { $exists: false},
   }
   common.find(collectionName, filter)
@@ -52,7 +52,7 @@ router.route('/user/:userId')
 router.route('/company/:companyId')
 .get((req, res) => {
   const filter = {
-    company_id: Number(req.params.companyId),
+    company_id: req.params.companyId,
     deleted_at: { $exists: false},
   }
   common.find(collectionName, filter)
@@ -65,7 +65,7 @@ router.route('/company/:companyId')
 router.route('/course/:courseId')
 .get((req, res) => {
   const filter = {
-    course_id: Number(req.params.courseId),
+    course_id: req.params.courseId,
     deleted_at: { $exists: false},
   }
   common.find(collectionName, filter)
@@ -79,7 +79,7 @@ router.route('/:userId/:category/:lessonType/:lessonName')
 .get((req, res) => {
   const filter = 
     {
-      user_id: Number(req.params.userId),
+      user_id: req.params.userId,
       category: req.params.category,
       lesson_type: req.params.lessonType,
       lesson_name: req.params.lessonName,
