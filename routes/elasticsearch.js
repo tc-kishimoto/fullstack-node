@@ -8,11 +8,10 @@ router.route('/')
 .get((req, res) => {
   find(req.query).then(data => {
     const result = data.body.hits.hits.map(e => {
-      const keywordIndex = e._source.text.indexOf(req.query.keyword)
       return { 
         title: e._source.title.replace('.md', ''),
         category: e._source.category,
-        text: e._source.text.substring(keywordIndex, keywordIndex + 100)
+        text: e.highlight.text[0]
       };
     })
     const response = {
@@ -50,6 +49,11 @@ async function find(params) {
           text: params.keyword
         }
       },
+      highlight: {
+        fields: {
+          text: {}
+        }
+      }
     }
   })
   return result;
