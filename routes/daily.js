@@ -25,7 +25,7 @@ router.route('/')
 
 router.route('/:id')
 .get((req, res) => {
-  common.findById(collectionName, req.params.id)
+  common.findByUUId(collectionName, req.params.id)
   .then(data => {
     if(data === null) {
       res.status(404).send('404 Not Found')
@@ -47,7 +47,7 @@ router.route('/:id')
 
 router.route('/user/:userId/:id')
 .get((req, res) => {
-  common.findById(collectionName, req.params.id)
+  common.findByUUId(collectionName, req.params.id)
   .then(data => {
     if(data === null || req.params.userId !== data.user_id) {
       res.status(404).send('404 Not Found')
@@ -66,7 +66,7 @@ router.route('/copy/:id')
 
 // コピー
 async function copy(id) {
-  const daily = await common.findById(collectionName, id)
+  const daily = await common.findByUUId(collectionName, id)
 
   delete daily._id;
   const today = new Date();

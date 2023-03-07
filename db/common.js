@@ -1,11 +1,30 @@
 'use strict';
-const { MongoClient } = require('mongodb')
+const { MongoClient, ObjectID } = require('mongodb')
 require('dotenv').config()
 
 const uri = process.env.NODE_ENV === 'test' ? process.env.MONGODB_TEST_URI : process.env.MONGODB_URI;
 const client = new MongoClient(uri);
 
 const findById = async (collectionName, id) => {
+  try {
+    await client.connect();
+    const database = client.db(process.env.DATABASE_NAME);
+    const collection = database.collection(collectionName);
+
+    const query = {
+      _id: ObjectID(id),
+    };
+    
+    const result = await collection.findOne(query);
+    return result;
+  } catch(error) {
+    console.log(error);
+  } finally {
+    await client.close();
+  }
+}
+
+const findByUUId = async (collectionName, id) => {
   try {
     await client.connect();
     const database = client.db(process.env.DATABASE_NAME);
@@ -145,4 +164,4 @@ const updateOne = async (collectionName, id, data) => {
   }
 }
 
-module.exports = { findById, findOne, find, insertOne, deleteOne, updateOne }
+module.exports = { findById, findByUUId, findOne, find, insertOne, deleteOne, updateOne }
