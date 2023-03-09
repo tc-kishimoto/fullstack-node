@@ -1,30 +1,12 @@
 'use strict';
-const { MongoClient, ObjectID } = require('mongodb')
+const { MongoClient } = require('mongodb')
 require('dotenv').config()
+const { v4: uuidv4 } = require('uuid');
 
 const uri = process.env.NODE_ENV === 'test' ? process.env.MONGODB_TEST_URI : process.env.MONGODB_URI;
 const client = new MongoClient(uri);
 
 const findById = async (collectionName, id) => {
-  try {
-    await client.connect();
-    const database = client.db(process.env.DATABASE_NAME);
-    const collection = database.collection(collectionName);
-
-    const query = {
-      _id: ObjectID(id),
-    };
-    
-    const result = await collection.findOne(query);
-    return result;
-  } catch(error) {
-    console.log(error);
-  } finally {
-    await client.close();
-  }
-}
-
-const findByUUId = async (collectionName, id) => {
   try {
     await client.connect();
     const database = client.db(process.env.DATABASE_NAME);
@@ -93,8 +75,10 @@ const insertOne = async (collectionName, data) => {
     const collection = database.collection(collectionName);
 
     const now = new Date();
+    const id = uuidv4();
 
     const doc = {
+      _id: id,
       ...data,
       created_at: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
     }
@@ -136,6 +120,23 @@ const deleteOne = async (collectionName, id) => {
   }
 }
 
+const physicalDeleteOne = async (collectionName, id) => {
+  try {
+    await client.connect();
+    const database = client.db(process.env.DATABASE_NAME);
+    const collection = database.collection(collectionName);
+
+    const query = { _id: id };
+
+    const result = await collection.deleteOne(query);
+    return result;
+  } catch(error) {
+    console.log(error);
+  } finally {
+    await client.close();
+  }
+}
+
 const updateOne = async (collectionName, id, data) => {
   try {
     await client.connect();
@@ -143,7 +144,7 @@ const updateOne = async (collectionName, id, data) => {
     const collection = database.collection(collectionName);
 
     const filter = { _id: id };
-    const options = { upsert: true };
+    const options = { upsert: false };
 
     const now = new Date();
 
@@ -164,4 +165,4 @@ const updateOne = async (collectionName, id, data) => {
   }
 }
 
-module.exports = { findById, findByUUId, findOne, find, insertOne, deleteOne, updateOne }
+module.exports = { findById, findOne, find, insertOne, deleteOne, physicalDeleteOne, updateOne }

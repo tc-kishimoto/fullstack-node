@@ -1,6 +1,7 @@
 'use strict';
 const express = require('express')
 const common = require('../db/common')
+const axios = require('axios')
 require('dotenv').config()
 
 const router = express.Router()
@@ -15,6 +16,23 @@ router.route('/')
     date: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`,
   })
   .then((data) => {
+    common.findById(collectionName, data.insertedId)
+    .then(newData => {
+      axios.post(`${process.env.API_URL}/notification/`, {
+        source_user_id: newData.user_id,
+        target: {
+          name: 'lesson',
+          id: newData._id,
+          label: `${newData.lesson_type}：${newData.category}(${newData.lesson_name})`,
+          action: '提出',
+        }
+      }).then(res => {  
+        // console.log('日報通知:成功')
+      }).catch(error => {
+        // console.log('日報通知:error')
+      })
+    })
+
     res.json(data)
   })
   .catch(console.dir);
@@ -30,6 +48,13 @@ router.route('/:id')
 })
 .put((req, res) => {
   common.updateOne(collectionName, req.params.id, req.body)
+  .then((data) => {
+    res.json(data)
+  })
+  .catch(console.dir);
+})
+.delete((req, res) => {
+  common.physicalDeleteOne(collectionName, req.params.id)
   .then((data) => {
     res.json(data)
   })

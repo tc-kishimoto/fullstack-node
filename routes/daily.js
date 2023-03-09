@@ -1,7 +1,7 @@
 'use strict'
-const express = require('express')
+const express = require('express');
 const common = require('../db/common');
-const { v4: uuidv4 } = require('uuid');
+const axios = require('axios');
 require('dotenv').config()
 
 const collectionName = 'daily';
@@ -15,9 +15,8 @@ const formatDate = (date) => {
 router.route('/')
 .post((req, res) => {
   const body = req.body
-  body._id = uuidv4();
   common.insertOne(collectionName, body)
-  .then((data) => {
+  .then((data) => {    
     res.json(data)
 })
   .catch(console.dir);
@@ -25,7 +24,7 @@ router.route('/')
 
 router.route('/:id')
 .get((req, res) => {
-  common.findByUUId(collectionName, req.params.id)
+  common.findById(collectionName, req.params.id)
   .then(data => {
     if(data === null) {
       res.status(404).send('404 Not Found')
@@ -36,7 +35,29 @@ router.route('/:id')
 })
 .put((req, res) => {
   common.updateOne(collectionName, req.params.id, req.body)
-  .then(() => res.status(200).send('OK'))
+  .then((data) => {
+
+    common.findById(collectionName, req.params.id)
+    .then(data => {  
+      // 通知データ作成
+      axios.post(`${process.env.API_URL}/notification/`, {
+        source_user_id: data.user_id,
+        target: {
+          name: 'daily',
+          id: data._id,
+          label: '日報',
+          action: '提出',
+        }
+      }).then(res => {  
+        // console.log('日報通知:成功')
+        // console.log(res)
+      }).catch(error => {
+        // console.log('日報通知:error')
+      })
+    })
+    // レスポンス返す
+    res.status(200).send('OK')
+})
   .catch(console.dir);
 })
 .delete((req, res) => {
@@ -47,7 +68,7 @@ router.route('/:id')
 
 router.route('/user/:userId/:id')
 .get((req, res) => {
-  common.findByUUId(collectionName, req.params.id)
+  common.findById(collectionName, req.params.id)
   .then(data => {
     if(data === null || req.params.userId !== data.user_id) {
       res.status(404).send('404 Not Found')
@@ -66,7 +87,7 @@ router.route('/copy/:id')
 
 // コピー
 async function copy(id) {
-  const daily = await common.findByUUId(collectionName, id)
+  const daily = await common.findById(collectionName, id)
 
   delete daily._id;
   const today = new Date();
@@ -74,7 +95,6 @@ async function copy(id) {
   daily.year = today.getFullYear();
   daily.month = today.getMonth() + 1;
   daily.day = today.getDate();
-  daily._id = uuidv4();
 
   const result = await common.insertOne(collectionName, daily);
   return result;
