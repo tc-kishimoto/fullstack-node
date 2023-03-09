@@ -13,6 +13,7 @@ router.route('/')
   const now = new Date()
   common.insertOne(collectionName, {
     ...req.body,
+    comments: [],
     date: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`,
   })
   .then((data) => {
@@ -25,6 +26,7 @@ router.route('/')
           id: newData._id,
           label: `${newData.lesson_type}：${newData.category}(${newData.lesson_name})`,
           action: '提出',
+          comment: newData.comment,
         }
       }).then(res => {  
         // console.log('日報通知:成功')
@@ -62,6 +64,7 @@ router.route('/:id')
           id: newData._id,
           label: `${newData.lesson_type}：${newData.category}(${newData.lesson_name})`,
           action: '再提出',
+          comment: newData.comment,
         }
       }).then(res => {  
         // console.log('日報通知:成功')
@@ -135,6 +138,38 @@ router.route('/:userId/:category/:lessonType/:lessonName')
     res.json(data)
   })
   .catch(console.dir);
+})
+
+router.route('/add-comment/:userId/:id')
+.post((req, res) => {
+  common.findById(collectionName, req.params.id)
+  .then(data => {
+    const now = new Date()
+    common.pushComment(collectionName, req.params.id, {
+      comment: req.body.comment, 
+      added_at: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
+    })
+    .then(() => {
+      // 通知
+      axios.post(`${process.env.API_URL}/notification/`, {
+        source_user_id: data.user_id,
+        target: {
+          name: 'lesson',
+          id: data._id,
+          label: `${data.lesson_type}：${data.category}(${data.lesson_name})`,
+          action: 'コメントを追加',
+          comment: req.body.comment,
+        }
+      }).then(res => {  
+        // console.log('日報通知:成功')
+      }).catch(error => {
+        // console.log('日報通知:error')
+      })
+
+      res.json(data)
+    })
+    .catch(console.dir);
+  })
 })
 
 module.exports = router

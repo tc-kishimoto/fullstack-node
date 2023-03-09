@@ -165,4 +165,28 @@ const updateOne = async (collectionName, id, data) => {
   }
 }
 
-module.exports = { findById, findOne, find, insertOne, deleteOne, physicalDeleteOne, updateOne }
+const pushComment = async (collectionName, id, data) => {
+  try {
+    await client.connect();
+    const database = client.db(process.env.DATABASE_NAME);
+    const collection = database.collection(collectionName);
+
+    const filter = { _id: id };
+
+    const updateDoc = {
+      $push: {
+        comments: data
+      }
+    }
+
+    const result = await collection.updateOne(filter, updateDoc);
+    return result;
+    
+  } catch(error) {
+    console.log(error);
+  } finally {
+    await client.close();
+  }
+}
+
+module.exports = { findById, findOne, find, insertOne, deleteOne, physicalDeleteOne, updateOne, pushComment }
