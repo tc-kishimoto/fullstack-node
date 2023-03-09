@@ -259,7 +259,8 @@ const getTestResult = async (params) => {
 const getSubmissions = async (params) => {
   const submissionFilter = {
     user_id: params.userId,
-    deleted_at: { $exists: false},
+    status: 'submission',
+    deleted_at: { $exists: false },
   }
   return await common.find('submission', submissionFilter)
 }

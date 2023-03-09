@@ -19,13 +19,20 @@ router.route('/')
   .then((data) => {
     common.findById(collectionName, data.insertedId)
     .then(newData => {
+      // 通知
+      let action = '';
+      if(newData.status === 'submission') {
+        action = '提出';
+      } else if(newData.status === 'delay') {
+        action = '遅延報告';
+      }
       axios.post(`${process.env.API_URL}/notification/`, {
         source_user_id: newData.user_id,
         target: {
           name: 'lesson',
           id: newData._id,
           label: `${newData.lesson_type}：${newData.category}(${newData.lesson_name})`,
-          action: '提出',
+          action: action,
           comment: newData.comment,
         }
       }).then(res => {  
@@ -63,7 +70,7 @@ router.route('/:id')
           name: 'lesson',
           id: newData._id,
           label: `${newData.lesson_type}：${newData.category}(${newData.lesson_name})`,
-          action: '再提出',
+          action: '更新',
           comment: newData.comment,
         }
       }).then(res => {  
