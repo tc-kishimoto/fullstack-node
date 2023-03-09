@@ -42,7 +42,11 @@ router.route('/:id')
 .get((req, res) => {
   common.findById(collectionName, req.params.id)
   .then((data) => {
-    res.json(data)
+    if(data === null) {
+      res.status(404).send('404 Not Found')
+    } else {
+      res.json(data)
+    }
   })
   .catch(console.dir);
 })
