@@ -1,7 +1,6 @@
 'use strict'
 const express = require('express');
 const common = require('../db/common');
-const axios = require('axios');
 require('dotenv').config()
 
 const collectionName = 'daily';
@@ -35,28 +34,15 @@ router.route('/:id')
 })
 .put((req, res) => {
   common.updateOne(collectionName, req.params.id, req.body)
-  .then((data) => {
-
+  .then(() => {
     common.findById(collectionName, req.params.id)
-    .then(data => {  
-      // 通知データ作成
-      axios.post(`${process.env.API_URL}/notification/`, {
-        source_user_id: data.user_id,
-        target: {
-          name: 'daily',
-          id: data._id,
-          label: '日報',
-          action: '提出',
-        }
-      }).then(res => {  
-        // console.log('日報通知:成功')
-        // console.log(res)
-      }).catch(error => {
-        // console.log('日報通知:error')
-      })
+    .then(data => {
+      res.json(data)
+    }).catch((error) => {
+      console.log(error)
+      // レスポンス返す
+      res.status(200).send('OK')
     })
-    // レスポンス返す
-    res.status(200).send('OK')
 })
   .catch(console.dir);
 })

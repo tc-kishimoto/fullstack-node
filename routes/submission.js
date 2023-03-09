@@ -1,7 +1,6 @@
 'use strict';
 const express = require('express')
 const common = require('../db/common')
-const axios = require('axios')
 require('dotenv').config()
 
 const router = express.Router()
@@ -19,30 +18,11 @@ router.route('/')
   .then((data) => {
     common.findById(collectionName, data.insertedId)
     .then(newData => {
-      // 通知
-      let action = '';
-      if(newData.status === 'submission') {
-        action = '提出';
-      } else if(newData.status === 'delay') {
-        action = '遅延報告';
-      }
-      axios.post(`${process.env.API_URL}/notification/`, {
-        source_user_id: newData.user_id,
-        target: {
-          name: 'lesson',
-          id: newData._id,
-          label: `${newData.lesson_type}：${newData.category}(${newData.lesson_name})`,
-          action: action,
-          comment: newData.comment,
-        }
-      }).then(res => {  
-        // console.log('日報通知:成功')
-      }).catch(error => {
-        // console.log('日報通知:error')
-      })
+      res.json(newData)
+    }).catch(error => {
+      console.log(error)
+      res.status(200).send('OK')
     })
-
-    res.json(data)
   })
   .catch(console.dir);
 })
@@ -64,23 +44,11 @@ router.route('/:id')
   .then((data) => {
     common.findById(collectionName, req.params.id)
     .then(newData => {
-      axios.post(`${process.env.API_URL}/notification/`, {
-        source_user_id: newData.user_id,
-        target: {
-          name: 'lesson',
-          id: newData._id,
-          label: `${newData.lesson_type}：${newData.category}(${newData.lesson_name})`,
-          action: '更新',
-          comment: newData.comment,
-        }
-      }).then(res => {  
-        // console.log('日報通知:成功')
-      }).catch(error => {
-        // console.log('日報通知:error')
-      })
+      res.json(newData)
+    }).catch(error => {
+      console.log(error)
+      res.status(200).send('OK')
     })
-
-    res.json(data)
   })
   .catch(console.dir);
 })
@@ -157,25 +125,11 @@ router.route('/add-comment/:userId/:id')
       added_at: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
     })
     .then(() => {
-      // 通知
-      axios.post(`${process.env.API_URL}/notification/`, {
-        source_user_id: data.user_id,
-        target: {
-          name: 'lesson',
-          id: data._id,
-          label: `${data.lesson_type}：${data.category}(${data.lesson_name})`,
-          action: 'コメントを追加',
-          comment: req.body.comment,
-        }
-      }).then(res => {  
-        // console.log('日報通知:成功')
-      }).catch(error => {
-        // console.log('日報通知:error')
-      })
-
       res.json(data)
     })
-    .catch(console.dir);
+    .catch(error => {
+      console.log(error)
+    });
   })
 })
 
