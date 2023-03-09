@@ -49,6 +49,23 @@ router.route('/:id')
 .put((req, res) => {
   common.updateOne(collectionName, req.params.id, req.body)
   .then((data) => {
+    common.findById(collectionName, req.params.id)
+    .then(newData => {
+      axios.post(`${process.env.API_URL}/notification/`, {
+        source_user_id: newData.user_id,
+        target: {
+          name: 'lesson',
+          id: newData._id,
+          label: `${newData.lesson_type}：${newData.category}(${newData.lesson_name})`,
+          action: '再提出',
+        }
+      }).then(res => {  
+        // console.log('日報通知:成功')
+      }).catch(error => {
+        // console.log('日報通知:error')
+      })
+    })
+
     res.json(data)
   })
   .catch(console.dir);
