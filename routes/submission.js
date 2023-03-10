@@ -1,7 +1,7 @@
 'use strict';
 const express = require('express')
 const common = require('../db/common')
-const { validateSubmission } = require('../middleware/validation')
+const { validateSubmission, validateSubmissionAddComment } = require('../middleware/validation')
 require('dotenv').config()
 
 const router = express.Router()
@@ -117,7 +117,7 @@ router.route('/:userId/:category/:lessonType/:lessonName')
 })
 
 router.route('/add-comment/:userId/:id')
-.post((req, res) => {
+.post(validateSubmissionAddComment, (req, res) => {
   common.findById(collectionName, req.params.id)
   .then(data => {
     const now = new Date()

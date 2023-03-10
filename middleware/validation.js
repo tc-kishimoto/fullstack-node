@@ -1,5 +1,7 @@
 const Joi = require('joi');
 
+const validationErrorStatus = 420;
+
 const validation = {
   validateSubmission: (req, res, next) => {
     const schema = Joi.object({
@@ -14,7 +16,19 @@ const validation = {
 
     const { error } = schema.validate(req.body);
     if (error) {
-      return res.status(420).json({ error: error.details[0].message });
+      return res.status(validationErrorStatus).json({ error: error.details[0].message });
+    }
+
+    next();
+  },
+  validateSubmissionAddComment: (req, res, next) =>  {
+    const schema = Joi.object({
+      comment: Joi.string().required(),
+    }).unknown(true);
+
+    const { error } = schema.validate(req.body);
+    if (error) {
+      return res.status(validationErrorStatus).json({ error: error.details[0].message });
     }
 
     next();
