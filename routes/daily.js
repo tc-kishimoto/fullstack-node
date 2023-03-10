@@ -53,6 +53,21 @@ router.route('/:id')
   .catch(console.dir);
 })
 
+router.route('/draft/:id')
+.put((req, res) => {
+  common.updateOne(collectionName, req.params.id, req.body)
+  .then(() => {
+    common.findById(collectionName, req.params.id)
+    .then(data => {
+      res.json(data)
+    }).catch((error) => {
+      console.log(error)
+      // レスポンス返す
+      res.status(200).send('OK')
+    })
+  })
+})
+
 router.route('/user/:userId/:id')
 .get((req, res) => {
   common.findById(collectionName, req.params.id)

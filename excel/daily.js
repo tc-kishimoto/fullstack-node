@@ -233,6 +233,7 @@ const getDailies = async (params) => {
     year: Number(params.year),
     month: Number(params.month),
     deleted_at: { $exists: false},
+    draft: false,
   };
   const dailyOptions = {
     sort: { date: -1},
