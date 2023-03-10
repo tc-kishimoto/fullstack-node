@@ -1,6 +1,7 @@
 'use strict';
 const express = require('express')
 const common = require('../db/common')
+const { validateSubmission } = require('../middleware/validation')
 require('dotenv').config()
 
 const router = express.Router()
@@ -8,7 +9,7 @@ const router = express.Router()
 const collectionName = 'submission';
 
 router.route('/')
-.post((req, res) => {
+.post(validateSubmission, (req, res) => {
   const now = new Date()
   common.insertOne(collectionName, {
     ...req.body,
