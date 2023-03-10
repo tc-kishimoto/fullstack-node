@@ -1,6 +1,7 @@
 'use strict'
 const express = require('express');
 const common = require('../db/common');
+const { validateDaily } = require('../middleware/validation');
 require('dotenv').config()
 
 const collectionName = 'daily';
@@ -32,7 +33,7 @@ router.route('/:id')
     }
   })
 })
-.put((req, res) => {
+.put(validateDaily, (req, res) => {
   common.updateOne(collectionName, req.params.id, req.body)
   .then(() => {
     common.findById(collectionName, req.params.id)
