@@ -40,7 +40,7 @@ router.route('/:id')
   })
   .catch(console.dir);
 })
-.put((req, res) => {
+.put(validateSubmission, (req, res) => {
   common.updateOne(collectionName, req.params.id, req.body)
   .then((data) => {
     common.findById(collectionName, req.params.id)
