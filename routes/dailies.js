@@ -1,6 +1,6 @@
 'use strict';
 const express = require('express')
-const common = require('../db/common')
+const mongo = require('../db/mongo')
 const fs = require('fs');
 const dailyExcel = require('../excel/daily')
 
@@ -14,7 +14,7 @@ router.route('/:userId/:year/:month')
     month: Number(req.params.month),
     deleted_at: { $exists: false},
   };
-  common.find('daily', filter)
+  mongo.find('daily', filter)
   .then(data => {
       res.json(data)
   });
@@ -29,7 +29,7 @@ router.route('/company/:companyId')
   const options = {
     sort: { date: -1},
   }
-  common.find('daily', filter, options)
+  mongo.find('daily', filter, options)
   .then(data => {
       res.json(data)
   });
@@ -44,7 +44,7 @@ router.route('/course/:couseId')
   const options = {
     sort: { date: -1},
   }
-  common.find('daily', filter, options)
+  mongo.find('daily', filter, options)
   .then(data => {
       res.json(data)
   });
@@ -59,7 +59,7 @@ router.route('/user/:userId')
   const options = {
     sort: { date: -1},
   }
-  common.find('daily', filter, options)
+  mongo.find('daily', filter, options)
   .then(data => {
       res.json(data)
   });

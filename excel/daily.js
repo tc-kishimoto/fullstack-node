@@ -1,5 +1,5 @@
 'use strict';
-const common = require('../db/common')
+const mongo = require('../db/mongo')
 const ExcelJS = require('exceljs');
 const path = require('path');
 
@@ -238,7 +238,7 @@ const getDailies = async (params) => {
   const dailyOptions = {
     sort: { date: -1},
   }
-  return await common.find('daily', dailyFilter, dailyOptions)
+  return await mongo.find('daily', dailyFilter, dailyOptions)
 }
 
 // テスト結果取得
@@ -253,7 +253,7 @@ const getTestResult = async (params) => {
   const testResultOptions = {
     sort: { date: 1},
   }
-  return await common.find('daily', testResultFilter, testResultOptions)
+  return await mongo.find('daily', testResultFilter, testResultOptions)
 }
 
 // 演習提出状況取得
@@ -263,7 +263,7 @@ const getSubmissions = async (params) => {
     status: 'submission',
     deleted_at: { $exists: false },
   }
-  return await common.find('submission', submissionFilter)
+  return await mongo.find('submission', submissionFilter)
 }
 
 module.exports = { createDailyWorkbook }

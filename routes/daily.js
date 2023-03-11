@@ -1,6 +1,6 @@
 'use strict'
 const express = require('express');
-const common = require('../db/common');
+const mongo = require('../db/mongo');
 const { validateDaily } = require('../middleware/validation');
 require('dotenv').config()
 
@@ -15,7 +15,7 @@ const formatDate = (date) => {
 router.route('/')
 .post((req, res) => {
   const body = req.body
-  common.insertOne(collectionName, body)
+  mongo.insertOne(collectionName, body)
   .then((data) => {    
     res.json(data)
 })
@@ -24,7 +24,7 @@ router.route('/')
 
 router.route('/:id')
 .get((req, res) => {
-  common.findById(collectionName, req.params.id)
+  mongo.findById(collectionName, req.params.id)
   .then(data => {
     if(data === null) {
       res.status(404).send('404 Not Found')
@@ -34,9 +34,9 @@ router.route('/:id')
   })
 })
 .put(validateDaily, (req, res) => {
-  common.updateOne(collectionName, req.params.id, req.body)
+  mongo.updateOne(collectionName, req.params.id, req.body)
   .then(() => {
-    common.findById(collectionName, req.params.id)
+    mongo.findById(collectionName, req.params.id)
     .then(data => {
       res.json(data)
     }).catch((error) => {
@@ -48,16 +48,16 @@ router.route('/:id')
   .catch(console.dir);
 })
 .delete((req, res) => {
-  common.deleteOne(collectionName, req.params.id)
+  mongo.deleteOne(collectionName, req.params.id)
     .then(() => res.status(200).send('OK'))
   .catch(console.dir);
 })
 
 router.route('/draft/:id')
 .put((req, res) => {
-  common.updateOne(collectionName, req.params.id, req.body)
+  mongo.updateOne(collectionName, req.params.id, req.body)
   .then(() => {
-    common.findById(collectionName, req.params.id)
+    mongo.findById(collectionName, req.params.id)
     .then(data => {
       res.json(data)
     }).catch((error) => {
@@ -70,7 +70,7 @@ router.route('/draft/:id')
 
 router.route('/user/:userId/:id')
 .get((req, res) => {
-  common.findById(collectionName, req.params.id)
+  mongo.findById(collectionName, req.params.id)
   .then(data => {
     if(data === null || req.params.userId !== data.user_id) {
       res.status(404).send('404 Not Found')
@@ -89,7 +89,7 @@ router.route('/copy/:id')
 
 // コピー
 async function copy(id) {
-  const daily = await common.findById(collectionName, id)
+  const daily = await mongo.findById(collectionName, id)
 
   delete daily._id;
   const today = new Date();
@@ -98,7 +98,7 @@ async function copy(id) {
   daily.month = today.getMonth() + 1;
   daily.day = today.getDate();
 
-  const result = await common.insertOne(collectionName, daily);
+  const result = await mongo.insertOne(collectionName, daily);
   return result;
 
 }

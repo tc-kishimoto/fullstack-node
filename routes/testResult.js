@@ -1,6 +1,6 @@
 'use strict'
 const express = require('express')
-const common = require('../db/common');
+const mongo = require('../db/mongo');
 
 const collectionName = 'daily';
 
@@ -16,7 +16,7 @@ router.route('/company/:companyId')
   const options = {
     sort: { date: -1},
   }
-  common.find(collectionName, filter, options)
+  mongo.find(collectionName, filter, options)
   .then(data => {
       res.json(data)
   });
@@ -32,7 +32,7 @@ router.route('/course/:courseId')
   const options = {
     sort: { date: -1},
   }
-  common.find(collectionName, filter, options)
+  mongo.find(collectionName, filter, options)
   .then(data => {
       res.json(data)
   });
@@ -48,7 +48,7 @@ router.route('/user/:userId')
   const options = {
     sort: { date: -1},
   }
-  common.find(collectionName, filter, options)
+  mongo.find(collectionName, filter, options)
   .then(data => {
       res.json(data)
   });
