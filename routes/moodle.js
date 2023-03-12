@@ -27,6 +27,7 @@ mqa.id
 , quiz_avg.avg_score
 , mq.grade max_score
 , DATE_FORMAT(FROM_UNIXTIME(mqa.timefinish), '%Y-%m-%d %H:%i:%s') finish_date
+, mqa.attempt
 FROM mdl_user mu 
 JOIN mdl_quiz_attempts mqa
 ON mu.id = mqa.userid
