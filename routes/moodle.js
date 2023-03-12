@@ -40,7 +40,7 @@ AND mq.id = mcm.instance
 JOIN mdl_course_sections mcs 
 ON mcm.course = mcs.course 
 AND mcm.section = mcs.id
-JOIN (select quiz, AVG(sumgrades) avg_score from mdl_quiz_attempts group by quiz) quiz_avg
+JOIN (select quiz, AVG(sumgrades) avg_score from mdl_quiz_attempts where attempt = 1 group by quiz) quiz_avg
 ON mqa.quiz = quiz_avg.quiz
 WHERE mu.id = ?
 AND mcm.module = 18
