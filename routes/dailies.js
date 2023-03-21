@@ -1,10 +1,10 @@
 'use strict';
 const express = require('express')
-const mongo = require('../db/mongo')
 const fs = require('fs');
-const xlsxPopulate = require('xlsx-populate');
-// const dailyExcel = require('../excel/daily')
+const mongo = require('../db/mongo')
 const dailyExcel = require('../excel/daily2')
+require('dotenv').config()
+
 
 const router = express.Router()
 
@@ -73,7 +73,7 @@ router.route('/download/:userId/:year/:month')
   
   // ファイル作成
   const workbook = await dailyExcel.createDailyWorkbook(req.params)
-  await workbook.toFileAsync(`daily-${req.params.userId}.xlsx`, {password: '1234'})
+  await workbook.toFileAsync(`daily-${req.params.userId}.xlsx`, {password: process.env.EXCEL_PASSWORD})
 
   res.download(`daily-${req.params.userId}.xlsx`, `daily-${req.params.userId}.xlsx`, (error) => {
     if (error) {
