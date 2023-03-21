@@ -73,7 +73,11 @@ router.route('/download/:userId/:year/:month')
   
   // ファイル作成
   const workbook = await dailyExcel.createDailyWorkbook(req.params)
-  await workbook.toFileAsync(`daily-${req.params.userId}.xlsx`, {password: process.env.EXCEL_PASSWORD})
+  if(process.env.EXCEL_PASSWORD_REQUIRED === 'yes') {
+    await workbook.toFileAsync(`daily-${req.params.userId}.xlsx`, {password: process.env.EXCEL_PASSWORD})
+  } else {
+    await workbook.toFileAsync(`daily-${req.params.userId}.xlsx`)
+  }
 
   res.download(`daily-${req.params.userId}.xlsx`, `daily-${req.params.userId}.xlsx`, (error) => {
     if (error) {

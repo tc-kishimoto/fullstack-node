@@ -36,15 +36,24 @@ const borderStyle = {
 
 const themeStyle = {
   horizontalAlignment: "center", 
+  verticalAlignment: "center",
   fill: "C4BD97",
   border: borderStyle
 }
 
 const headerStyle = {
   horizontalAlignment: "center", 
+  verticalAlignment: "center",
   fill: "DDD9C4",
   border: borderStyle
 }
+
+const noDataStyle = { 
+  horizontalAlignment: "center", 
+  verticalAlignment: "center",
+  fill: "dcdcdc",
+  border: borderStyle,
+};
 
 const createDailyWorkbook = async (params) => {
 
@@ -94,7 +103,9 @@ const createDailyWorkbook = async (params) => {
     newSheet.cell("C9").value('身だしなみ')
     newSheet.cell("D9").value('時間管理')
     newSheet.cell("E9").value('報告・連絡・相談・確認')
-    newSheet.range("B9:F9").style(headerStyle)
+    newSheet.range("B9:E9").style(headerStyle)
+    newSheet.cell("F9").value('-')
+    newSheet.cell("F9").style(noDataStyle)
 
     if (daily.speech_or_discussion === 'speech') {
       newSheet.cell('B12').value('スピーチ')
@@ -107,7 +118,9 @@ const createDailyWorkbook = async (params) => {
     newSheet.cell('C13').value('自分に当てはまる改善点')
     newSheet.cell('D13').value('発表をして/聞いていて気づいた点')
     newSheet.cell('E13').value('改善点に対する具体的解決策')
-    newSheet.range("B13:F13").style(headerStyle)
+    newSheet.range("B13:E13").style(headerStyle)
+    newSheet.cell('F13').value('-')
+    newSheet.cell('F13').style(noDataStyle)
 
     newSheet.cell('B16').value('研修内容')
     newSheet.cell('B17').value('概要')
@@ -192,15 +205,17 @@ const createDailyWorkbook = async (params) => {
     newSheet.cell('C10').value(daily.manner2)
     newSheet.cell('D10').value(daily.manner3)
     newSheet.cell('E10').value(daily.manner4)
-    newSheet.range('B10:F10').style({
+    newSheet.range('B10:E10').style({
       horizontalAlignment: "left", 
       verticalAlignment: "top",
       border: borderStyle
     })
+    newSheet.cell('F10').value('-')
+    newSheet.cell('F10').style(noDataStyle)
 
     // スピーチ・ディスカッション
     if (daily.speech_or_discussion === 'none') {
-      createNonValueCells(newSheet, ['B14', 'C14', 'D14', 'E14'])
+      createNonValueCells(newSheet, ['B14', 'C14', 'D14', 'E14', 'F14'])
     } else {
       newSheet.cell('B14').value(daily.speech_theme)
       newSheet.cell('B14').style({
@@ -218,6 +233,8 @@ const createDailyWorkbook = async (params) => {
         border: borderStyle,
         wrapText: true
       })
+      newSheet.cell('F14').value('-')
+      newSheet.cell('F14').style(noDataStyle)
      
     }
 
@@ -314,19 +331,6 @@ const createDailyWorkbook = async (params) => {
 }
 
 const createNonValueCells = (sheet, areas) => {
-  // const noDataStyle = { 
-  //   alignment: { horizontal: 'center', vertical: 'middle'},
-  //   border: {
-  //     left: {style: 'thin', color: {argb: 'FF000000'}},
-  //     right: {style: 'thin', color: {argb: 'FF000000'}},
-  //     top: {style: 'thin', color: {argb: 'FF000000'}},
-  //     bottom: {style: 'thin', color: {argb: 'FF000000'}},
-  //   }
-  // };
-  const noDataStyle = { 
-   
-  };
-
   areas.forEach(area => {
     sheet.cell(area).value('-');
     sheet.cell(area).style(noDataStyle)
@@ -340,7 +344,9 @@ const createActualResultSheet = async (workbook, params) => {
   sheet.cell("A1").value('実績管理表')
   sheet.range("A1:C2").merged(true)
   sheet.cell("A1").style({
-    fontSize: "22"
+    fontSize: "22",
+    horizontalAlignment: "center", 
+    verticalAlignment: "center",
   })
 
   sheet.cell('A5').value('テスト')
