@@ -341,6 +341,8 @@ const createNonValueCells = (sheet, areas) => {
 const createActualResultSheet = async (workbook, params) => {
   const sheet = workbook.addSheet("実績管理表")
 
+  workbook.moveSheet("実績管理表", 0)
+
   sheet.cell("A1").value('実績管理表')
   sheet.range("A1:C2").merged(true)
   sheet.cell("A1").style({
@@ -445,7 +447,7 @@ const getDailies = async (params) => {
     draft: false,
   };
   const dailyOptions = {
-    sort: { date: -1},
+    sort: { day: -1},
   }
   return await mongo.find('daily', dailyFilter, dailyOptions)
 }
