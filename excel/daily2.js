@@ -509,16 +509,39 @@ const createActualResultSheet = async (workbook, params) => {
   // 演習エリア
   row = startRow
   submissions.forEach(submission => {
+    sheet.row(row).height(40)
     sheet.cell(`G${row}`).value(submission.category)
     sheet.cell(`H${row}`).value(submission.lesson_type)
     sheet.cell(`I${row}`).value(submission.lesson_name)
     sheet.cell(`J${row}`).value(submission.date)
-    sheet.range(`G${row}:J${row}`).style({
+    sheet.range(`H${row}:J${row}`).style({
       horizontalAlignment: "center", 
       verticalAlignment: "center",
       border: borderStyle,
     })
     row++;
+  })
+  sheet.range(`G5:G${row-1}`).style({
+    horizontalAlignment: "center", 
+    verticalAlignment: "center",
+    border: {
+      top: {
+        style: 'thin',
+        color: '000000'
+      },
+      left: {
+        style: 'double',
+        color: '000000'
+      },
+      bottom: {
+        style: 'thin',
+        color: '000000'
+      },
+      right: {
+        style: 'thin',
+        color: '000000'
+      }
+    }
   })
 }
 
