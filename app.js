@@ -15,6 +15,7 @@ app.use('/api/daily', require('./routes/daily'))
 app.use('/api/dailies', require('./routes/dailies'))
 app.use('/api/submission', require('./routes/submission'))
 app.use('/api/test-result', require('./routes/testResult'))
+app.use('/api/quiz-answer', require('./routes/quizAnswer'))
 app.use('/api/moodle', require('./routes/moodle'))
 
 app.listen(process.env.LISTEN_PORT)
