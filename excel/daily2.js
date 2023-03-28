@@ -246,7 +246,10 @@ const createDailyWorkbook = async (params) => {
       newSheet.cell('B20').value(daily.personal_develop_work_content)
       newSheet.cell('C20').value(daily.personal_develop_task)
       newSheet.cell('D20').value(daily.personal_develop_solusion)
-      newSheet.range('B20:F20').style({
+      newSheet.cell('E20').value('-')
+      newSheet.cell('F20').value('-')
+      newSheet.range("E20:F20").style(noDataStyle)
+      newSheet.range('B20:D20').style({
         horizontalAlignment: "left", 
         verticalAlignment: "top",
         border: borderStyle,
@@ -305,7 +308,10 @@ const createDailyWorkbook = async (params) => {
       newSheet.cell('B20').value(daily.team_develop_work_content)
       newSheet.cell('C20').value(daily.team_develop_task)
       newSheet.cell('D20').value(daily.team_develop_solusion)
-      newSheet.range('B20:F20').style({
+      newSheet.cell('E20').value('-')
+      newSheet.cell('F20').value('-')
+      newSheet.range("E20:F20").style(noDataStyle)
+      newSheet.range('B20:D20').style({
         horizontalAlignment: "left", 
         verticalAlignment: "top",
         border: borderStyle,
