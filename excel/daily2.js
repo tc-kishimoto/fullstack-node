@@ -122,24 +122,6 @@ const createDailyWorkbook = async (params) => {
     newSheet.cell('F13').value('-')
     newSheet.cell('F13').style(noDataStyle)
 
-    newSheet.cell('B16').value('研修内容')
-    newSheet.cell('B17').value('概要')
-    newSheet.cell('C17').value('実績（自信を持って理解できたこと）')
-    newSheet.cell('D17').value('復習の必要な項目')
-    newSheet.cell('E17').value('理解できなかった原因')
-    newSheet.cell('F17').value('原因に対する解決策')
-    newSheet.range("B17:F17").style(headerStyle)
-
-    newSheet.cell('B20').value('テスト結果')
-    newSheet.cell('B21').value('テスト対象単元')
-    newSheet.cell('C21').value('取得点数')
-    newSheet.cell('D21').value('平均点')
-    newSheet.cell('E21').value('合格点')
-    newSheet.cell('F21').value('満点')
-    newSheet.range("B21:F21").style(headerStyle)
-
-    newSheet.cell('B24').value('自由記述欄')
-
     newSheet.column("A").width(2.5)
     newSheet.column("B").width(35)
     newSheet.column("C").width(35)
@@ -155,11 +137,7 @@ const createDailyWorkbook = async (params) => {
     newSheet.range("B12:F12").style(themeStyle)
     newSheet.range("B16:F16").merged(true)
     newSheet.range("B16:F16").style(themeStyle)
-    newSheet.range("B20:F20").merged(true)
-    newSheet.range("B20:F20").style(themeStyle)
-    newSheet.range("B24:F24").merged(true)
-    newSheet.range("B24:F24").style(themeStyle)
-    newSheet.range("B25:F25").merged(true)
+
 
     newSheet.row(1).height(8)
     newSheet.row(2).height(24)
@@ -176,16 +154,7 @@ const createDailyWorkbook = async (params) => {
     newSheet.row(13).height(16)
     newSheet.row(14).height(64)
     newSheet.row(15).height(8)
-    newSheet.row(16).height(16)
-    newSheet.row(17).height(16)
-    newSheet.row(18).height(64)
-    newSheet.row(19).height(8)
-    newSheet.row(20).height(16)
-    newSheet.row(21).height(16)
-    newSheet.row(22).height(48)
-    newSheet.row(23).height(8)
-    newSheet.row(24).height(16)
-    newSheet.row(25).height(64)
+
 
     // 各データをセット
     // 基本情報
@@ -239,6 +208,23 @@ const createDailyWorkbook = async (params) => {
     }
 
     if (daily.daily_type === 'personal_develop') {
+      // 個人開発
+      newSheet.row(16).height(16)
+      newSheet.row(17).height(16)
+      newSheet.row(18).height(32)
+      newSheet.row(19).height(16)
+      newSheet.row(20).height(64)
+      newSheet.row(21).height(8)
+      newSheet.row(22).height(16)
+      newSheet.row(23).height(64)
+
+      newSheet.cell('B16').value('個人開発')
+      newSheet.cell('B17').value('開発テーマ（システム名）')
+      newSheet.cell('C17').value('本日の進捗率')
+      newSheet.cell('D17').value('全体進捗率')
+      newSheet.cell('E17').value('本日までの予定進捗率')
+      newSheet.cell('F17').value('詳細リンク')
+      newSheet.range("B17:F17").style(headerStyle)
       newSheet.cell('B18').value(daily.personal_develop_theme)
       newSheet.cell('C18').value(daily.personal_develop_today_progress)
       newSheet.cell('D18').value(daily.personal_develop_overall_progress)
@@ -250,6 +236,13 @@ const createDailyWorkbook = async (params) => {
         border: borderStyle,
         wrapText: true
       })
+      newSheet.cell('B19').value('作業内容')
+      newSheet.cell('C19').value('現在の課題')
+      newSheet.cell('D19').value('課題に対する解決策')
+      newSheet.cell('E19').value('-')
+      newSheet.cell('F19').value('-')
+      newSheet.range("B19:D19").style(headerStyle)
+      newSheet.range("E19:F19").style(noDataStyle)
       newSheet.cell('B20').value(daily.personal_develop_work_content)
       newSheet.cell('C20').value(daily.personal_develop_task)
       newSheet.cell('D20').value(daily.personal_develop_solusion)
@@ -259,7 +252,38 @@ const createDailyWorkbook = async (params) => {
         border: borderStyle,
         wrapText: true
       })
+
+      // 自由記述
+      newSheet.range("B22:F22").merged(true)
+      newSheet.range("B22:F22").style(themeStyle)
+      newSheet.range("B23:F23").merged(true)
+      newSheet.cell('B22').value('自由記述欄')
+      newSheet.cell('B23').value(daily.free_description)
+      newSheet.range('B23:F23').style({
+        horizontalAlignment: "left", 
+        verticalAlignment: "top",
+        border: borderStyle,
+        wrapText: true
+      })
+
     } else if (daily.daily_type === 'team_develop') {
+      // チーム開発
+      newSheet.row(16).height(16)
+      newSheet.row(17).height(16)
+      newSheet.row(18).height(32)
+      newSheet.row(19).height(16)
+      newSheet.row(20).height(64)
+      newSheet.row(21).height(8)
+      newSheet.row(22).height(16)
+      newSheet.row(23).height(64)
+
+      newSheet.cell('B16').value('チーム開発')
+      newSheet.cell('B17').value('開発テーマ（システム名）')
+      newSheet.cell('C17').value('本日の進捗率')
+      newSheet.cell('D17').value('全体進捗率')
+      newSheet.cell('E17').value('本日までの予定進捗率')
+      newSheet.cell('F17').value('詳細リンク')
+      newSheet.range("B17:F17").style(headerStyle)
       newSheet.cell('B18').value(daily.team_develop_theme)
       newSheet.cell('C18').value(daily.team_develop_today_progress)
       newSheet.cell('D18').value(daily.team_develop_overall_progress)
@@ -271,6 +295,13 @@ const createDailyWorkbook = async (params) => {
         border: borderStyle,
         wrapText: true
       })
+      newSheet.cell('B19').value('作業内容')
+      newSheet.cell('C19').value('現在の課題')
+      newSheet.cell('D19').value('課題に対する解決策')
+      newSheet.cell('E19').value('-')
+      newSheet.cell('F19').value('-')
+      newSheet.range("B19:D19").style(headerStyle)
+      newSheet.range("E19:F19").style(noDataStyle)
       newSheet.cell('B20').value(daily.team_develop_work_content)
       newSheet.cell('C20').value(daily.team_develop_task)
       newSheet.cell('D20').value(daily.team_develop_solusion)
@@ -280,8 +311,51 @@ const createDailyWorkbook = async (params) => {
         border: borderStyle,
         wrapText: true
       })
+
+      // 自由記述
+      newSheet.range("B22:F22").merged(true)
+      newSheet.range("B22:F22").style(themeStyle)
+      newSheet.range("B23:F23").merged(true)
+      newSheet.cell('B22').value('自由記述欄')
+      newSheet.cell('B23').value(daily.free_description)
+      newSheet.range('B23:F23').style({
+        horizontalAlignment: "left", 
+        verticalAlignment: "top",
+        border: borderStyle,
+        wrapText: true
+      })
     } else {
       // 研修内容
+      newSheet.row(16).height(16)
+      newSheet.row(17).height(16)
+      newSheet.row(18).height(64)
+      newSheet.row(19).height(8)
+      newSheet.row(20).height(16)
+      newSheet.row(21).height(16)
+      newSheet.row(22).height(48)
+      newSheet.row(23).height(8)
+      newSheet.row(24).height(16)
+      newSheet.row(25).height(64)
+
+      newSheet.range("B20:F20").merged(true)
+      newSheet.range("B20:F20").style(themeStyle)
+
+      newSheet.cell('B16').value('研修内容')
+      newSheet.cell('B17').value('概要')
+      newSheet.cell('C17').value('実績（自信を持って理解できたこと）')
+      newSheet.cell('D17').value('復習の必要な項目')
+      newSheet.cell('E17').value('理解できなかった原因')
+      newSheet.cell('F17').value('原因に対する解決策')
+      newSheet.range("B17:F17").style(headerStyle)
+
+      newSheet.cell('B20').value('テスト結果')
+      newSheet.cell('B21').value('テスト対象単元')
+      newSheet.cell('C21').value('取得点数')
+      newSheet.cell('D21').value('平均点')
+      newSheet.cell('E21').value('合格点')
+      newSheet.cell('F21').value('満点')
+      newSheet.range("B21:F21").style(headerStyle)
+
       newSheet.cell('B18').value(daily.main_overview)
       newSheet.cell('C18').value(daily.main_achievement)
       newSheet.cell('D18').value(daily.main_review)
@@ -310,15 +384,20 @@ const createDailyWorkbook = async (params) => {
           border: borderStyle
         })
       }
+
+      // 自由記述
+      newSheet.range("B24:F24").merged(true)
+      newSheet.range("B24:F24").style(themeStyle)
+      newSheet.range("B25:F25").merged(true)
+      newSheet.cell('B24').value('自由記述欄')
+      newSheet.cell('B25').value(daily.free_description)
+      newSheet.range('B25:F25').style({
+        horizontalAlignment: "left", 
+        verticalAlignment: "top",
+        border: borderStyle,
+        wrapText: true
+      })
     }
-    // 自由記述
-    newSheet.cell('B25').value(daily.free_description)
-    newSheet.range('B25:F25').style({
-      horizontalAlignment: "left", 
-      verticalAlignment: "top",
-      border: borderStyle,
-      wrapText: true
-    })
 
     sheetCount++;
   }
