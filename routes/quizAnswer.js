@@ -27,6 +27,15 @@ router.route('/user/:userId')
   })
 })
 
+router.route('/score/:id/:index/:score')
+.put((req, res) => {
+  const data = { [`detail.${req.params.index}.score`] : req.params.score }
+  mongo.updateOne(collectionName, req.params.id, data)
+  .then(() => {
+    res.status(200)
+  })
+})
+
 router.route('/:id')
 .get((req, res) => {
   mongo.findById(collectionName, req.params.id)
