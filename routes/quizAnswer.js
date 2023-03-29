@@ -8,13 +8,20 @@ const router = express.Router()
 
 router.route('/')
 .post((req, res) => {
-  const body = req.body
-  mongo.insertOne(collectionName, body)
-  .then((data) => {    
+  mongo.insertOne(collectionName, req.body)
+  .then((data) => {  
     res.json(data)
 })
   .catch(console.dir);
 })
 
+router.route('/:id')
+.put((req, res) => {
+  mongo.updateOne(collectionName, req.params.id, req.body)
+  .then((data) => {    
+    res.json(data)
+})
+  .catch(console.dir);
+})
 
 module.exports = router
