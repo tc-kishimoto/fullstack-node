@@ -15,6 +15,18 @@ router.route('/')
   .catch(console.dir);
 })
 
+router.route('/user/:userId')
+.get((req, res) => {
+  const filter = {
+    user_id: req.params.userId,
+    deleted_at: { $exists: false},
+  };
+  mongo.find(collectionName, filter)
+  .then(data => {
+    res.json(data)
+  })
+})
+
 router.route('/:id')
 .get((req, res) => {
   mongo.findById(collectionName, req.params.id)
@@ -41,6 +53,7 @@ router.route('/:id')
         return q;
       })
       data.detail = newDetail;
+      data.score = newDetail.reduce((acc, curr) => acc + curr.score, 0)
       mongo.updateOne(collectionName, req.params.id, data)
       .then((data2) => {
         res.json(data2)
