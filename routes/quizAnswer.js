@@ -32,7 +32,17 @@ router.route('/score/:id/:index/:score')
   const data = { [`detail.${req.params.index}.score`] : req.params.score }
   mongo.updateOne(collectionName, req.params.id, data)
   .then(() => {
-    res.status(200)
+    // 全体のスコアを更新する
+    mongo.findById(collectionName, req.params.id)
+    .then(data => {
+      // res.json(data)
+      const score = data.detail.reduce((acc, curr) => acc + curr.score, 0)
+      const scoreData = { score: score }
+      mongo.updateOne(collectionName, req.params.id, scoreData)
+      .then(() => {
+        res.status(200)
+      })
+    })
   })
 })
 
