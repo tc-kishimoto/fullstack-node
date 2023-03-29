@@ -4,9 +4,10 @@ require('dotenv').config()
 const { v4: uuidv4 } = require('uuid');
 
 const uri = process.env.NODE_ENV === 'test' ? process.env.MONGODB_TEST_URI : process.env.MONGODB_URI;
-const client = new MongoClient(uri);
+// const client = new MongoClient(uri);
 
 const findById = async (collectionName, id) => {
+  const client = new MongoClient(uri);
   try {
     await client.connect();
     const database = client.db(process.env.DATABASE_NAME);
@@ -26,6 +27,7 @@ const findById = async (collectionName, id) => {
 }
 
 const findOne = async (collectionName, filter) => {
+  const client = new MongoClient(uri);
   try {
     await client.connect();
     const database = client.db(process.env.DATABASE_NAME);
@@ -44,6 +46,7 @@ const findOne = async (collectionName, filter) => {
 }
 
 const find = async (collectionName, filter, options) => {
+  const client = new MongoClient(uri);
   try {
     await client.connect();
     const database = client.db(process.env.DATABASE_NAME);
@@ -69,6 +72,7 @@ const find = async (collectionName, filter, options) => {
 }
 
 const insertOne = async (collectionName, data) => {
+  const client = new MongoClient(uri);
   try {
     await client.connect();
     const database = client.db(process.env.DATABASE_NAME);
@@ -95,6 +99,7 @@ const insertOne = async (collectionName, data) => {
 }
 
 const deleteOne = async (collectionName, id) => {
+  const client = new MongoClient(uri);
   try {
     await client.connect();
     const database = client.db(process.env.DATABASE_NAME);
@@ -121,6 +126,7 @@ const deleteOne = async (collectionName, id) => {
 }
 
 const physicalDeleteOne = async (collectionName, id) => {
+  const client = new MongoClient(uri);
   try {
     await client.connect();
     const database = client.db(process.env.DATABASE_NAME);
@@ -138,6 +144,7 @@ const physicalDeleteOne = async (collectionName, id) => {
 }
 
 const updateOne = async (collectionName, id, data) => {
+  const client = new MongoClient(uri);
   try {
     await client.connect();
     const database = client.db(process.env.DATABASE_NAME);
@@ -166,6 +173,7 @@ const updateOne = async (collectionName, id, data) => {
 }
 
 const pushComment = async (collectionName, id, data) => {
+  const client = new MongoClient(uri);
   try {
     await client.connect();
     const database = client.db(process.env.DATABASE_NAME);
