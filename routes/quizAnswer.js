@@ -67,7 +67,7 @@ router.route('/:id')
       // スコアの更新
       if(data != null) {
         let sumScore = 0;
-        for(let i = 1; i <= data.quiz_count; i++) {
+        for(let i = 1; i <= data.quizCount; i++) {
           let score = 0
           const quiz = data[`quiz-${i}`]
           if ((quiz.type === 'radio' || quiz.type === 'text') && quiz.answer === quiz.user_answer) {
@@ -81,6 +81,8 @@ router.route('/:id')
             }
           }
           sumScore += score;
+          console.log(score)
+          console.log(data._id)
           const scoreData = { [`quiz-${i}.score`] : score }
           mongo.updateOne(collectionName, data._id, scoreData)
         }
