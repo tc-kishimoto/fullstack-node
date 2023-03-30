@@ -27,6 +27,20 @@ router.route('/user/:userId')
   })
 })
 
+router.route('/user/:userId/:category/:title')
+.get((req, res) => {
+  const filter = {
+    user_id: req.params.userId,
+    category: req.params.category,
+    title: req.params.title,
+    deleted_at: { $exists: false},
+  };
+  mongo.find(collectionName, filter)
+  .then(data => {
+    res.json(data)
+  })
+})
+
 router.route('/score/:id/:index/:score')
 .put((req, res) => {
   const data = { [`quiz-${req.params.index}.score`] : Number(req.params.score) }
