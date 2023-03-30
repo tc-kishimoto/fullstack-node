@@ -29,15 +29,18 @@ router.route('/user/:userId')
 
 router.route('/score/:id/:index/:score')
 .put((req, res) => {
-  const data = { [`detail.${req.params.index}.score`] : Number(req.params.score) }
+  const data = { [`quiz-${req.params.index}.score`] : Number(req.params.score) }
   mongo.updateOne(collectionName, req.params.id, data)
   .then(() => {
     // 全体のスコアを更新する
     mongo.findById(collectionName, req.params.id)
     .then(data => {
       // res.json(data)
-      const score = data.detail.reduce((acc, curr) => acc + curr.score, 0)
-      const scoreData = { score: score }
+      let sumScore = 0;
+      for(let i = 1; i <= data.quiz_count; i++) {
+        sumScore += data[`quiz-${i}`].score;
+      }
+      const scoreData = { score: sumScore }
       mongo.updateOne(collectionName, req.params.id, scoreData)
       .then(() => {
         res.status(200)
@@ -56,27 +59,32 @@ router.route('/:id')
   })
 })
 .put((req, res) => {
+  // idがundefinedになっている時がある
   mongo.updateOne(collectionName, req.params.id, req.body)
   .then(() => {    
     mongo.findById(collectionName, req.params.id)
     .then(data => {
+      // スコアの更新
       if(data != null) {
-        const newDetail = data.detail.map(q => {
-          if ((q.type === 'radio' || q.type === 'text') && q.answer === q.user_answer) {
-            return { ...q, score: q.maxScore };
+        let sumScore = 0;
+        for(let i = 1; i <= data.quiz_count; i++) {
+          let score = 0
+          const quiz = data[`quiz-${i}`]
+          if ((quiz.type === 'radio' || quiz.type === 'text') && quiz.answer === quiz.user_answer) {
+            score = quiz.maxScore;
           }
-          if (q.type === 'checkbox' && q.user_answer !== null) {
-            const answer1 = q.answer.sort();
-            const answer2 = q.user_answer.sort();
+          if (quiz.type === 'checkbox' && quiz.user_answer !== null) {
+            const answer1 = quiz.answer.sort();
+            const answer2 = quiz.user_answer.sort();
             if(answer1.every((value, index) => value === answer2[index])) {
-              return { ...q, score: q.maxScore };
+              score = quiz.maxScore;
             }
           }
-          return q;
-        })
-        data.detail = newDetail;
-        data.score = newDetail.reduce((acc, curr) => acc + curr.score, 0)
-        mongo.updateOne(collectionName, req.params.id, data)
+          sumScore += score;
+          const scoreData = { [`quiz-${i}.score`] : score }
+          mongo.updateOne(collectionName, data._id, scoreData)
+        }
+        mongo.updateOne(collectionName, data._id, { score: sumScore})
         .then((data2) => {
           res.json(data2)
         })
