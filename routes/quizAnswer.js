@@ -27,7 +27,33 @@ router.route('/user/:userId')
   })
 })
 
+router.route('/course/:couseId')
+.get((req, res) => {
+  const filter = {
+    course_id: req.params.couseId,
+    deleted_at: { $exists: false},
+  };
+  mongo.find(collectionName, filter)
+  .then(data => {
+    res.json(data)
+  })
+})
+
 router.route('/user/:userId/:category/:title')
+.get((req, res) => {
+  const filter = {
+    user_id: req.params.userId,
+    category: req.params.category,
+    title: req.params.title,
+    deleted_at: { $exists: false},
+  };
+  mongo.find(collectionName, filter)
+  .then(data => {
+    res.json(data)
+  })
+})
+
+router.route('/user/finish/:userId/:category/:title')
 .get((req, res) => {
   const filter = {
     user_id: req.params.userId,
