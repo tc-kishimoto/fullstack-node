@@ -120,9 +120,28 @@ router.route('/:id')
               score = quiz.maxScore;
             }
           }
+          if (quiz.type === 'combination' && quiz.user_answer !== null) {
+            const totalQuestions = quiz.answer.length;
+            let correctAnswers = 0;
+          
+            for (let i = 0; i < totalQuestions; i++) {
+              if (quiz.user_answer.length < i) {
+                break;
+              }
+              const correctAnswerIndex = quiz.answer.findIndex(
+                (choice) =>
+                  choice.question_id === quiz.user_answer[i].question_id && choice.choice_id === quiz.user_answer[i].choice_id
+              );
+              if (correctAnswerIndex !== -1) {
+                correctAnswers++;
+              }
+            }
+          
+            score = correctAnswers / totalQuestions;
+            score = score < 1 ? score : 1;
+            score = Math.round(score * 100) / 100;
+          }
           sumScore += score;
-          console.log(score)
-          console.log(data._id)
           const scoreData = { [`quiz-${i}.score`] : score }
           mongo.updateOne(collectionName, data._id, scoreData)
         }
