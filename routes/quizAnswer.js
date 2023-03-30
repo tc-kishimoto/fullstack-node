@@ -77,7 +77,7 @@ router.route('/score/:id/:index/:score')
     .then(data => {
       // res.json(data)
       let sumScore = 0;
-      for(let i = 1; i <= data.quiz_count; i++) {
+      for(let i = 1; i <= data.quizCount; i++) {
         sumScore += data[`quiz-${i}`].score;
       }
       const scoreData = { score: sumScore }
