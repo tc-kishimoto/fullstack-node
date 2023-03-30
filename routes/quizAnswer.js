@@ -136,7 +136,21 @@ router.route('/:id')
                 correctAnswers++;
               }
             }
+            score = correctAnswers / totalQuestions;
+            score = score < 1 ? score : 1;
+            score = Math.round(score * 100) / 100;
+          }
+          if (quiz.type === 'fill' && quiz.user_answer !== null) {
+            const totalQuestions = quiz.answer.length;
+            let correctAnswers = 0;
           
+            for (let i = 0; i < totalQuestions; i++) {
+              const key = Object.keys(quiz.answer[i])[0]
+              const target = quiz.user_answer.find(e => e !== null && Object.keys(e)[0] === key)
+              if(target !== undefined && target[key] === quiz.answer[i][key]) {
+                correctAnswers++;
+              }
+            }
             score = correctAnswers / totalQuestions;
             score = score < 1 ? score : 1;
             score = Math.round(score * 100) / 100;
