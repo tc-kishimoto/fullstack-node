@@ -138,7 +138,7 @@ router.route('/:id')
             }
             score = correctAnswers / totalQuestions;
             score = score < 1 ? score : 1;
-            score = Math.round(score * 100) / 100;
+            score = Math.round(score * quiz.maxScore * 100) / 100;
           }
           if (quiz.type === 'fill' && quiz.user_answer !== null) {
             const totalQuestions = quiz.answer.length;
@@ -153,7 +153,7 @@ router.route('/:id')
             }
             score = correctAnswers / totalQuestions;
             score = score < 1 ? score : 1;
-            score = Math.round(score * 100) / 100;
+            score = Math.round(score * quiz.maxScore * 100) / 100;
           }
           sumScore += score;
           const scoreData = { [`quiz-${i}.score`] : score }
