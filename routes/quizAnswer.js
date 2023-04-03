@@ -98,6 +98,12 @@ router.route('/:id')
     res.json(data)
   })
 })
+.delete((req, res) => {
+  mongo.deleteOne(collectionName, req.params.id)
+  .then(data => {
+    res.json(data)
+  })
+})
 .put((req, res) => {
   // idがundefinedになっている時がある
   mongo.updateOne(collectionName, req.params.id, req.body)
