@@ -134,6 +134,9 @@ router.route('/:id')
               if (quiz.user_answer.length < i) {
                 break;
               }
+              if(quiz.user_answer[i] === undefined || quiz.user_answer[i] === null) {
+                continue;
+              }
               const correctAnswerIndex = quiz.answer.findIndex(
                 (choice) =>
                   choice.question_id === quiz.user_answer[i].question_id && choice.choice_id === quiz.user_answer[i].choice_id
