@@ -79,12 +79,18 @@ const insertOne = async (collectionName, data) => {
     const collection = database.collection(collectionName);
 
     const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hour = String(now.getHours()).padStart(2, '0');
+    const minute = String(now.getMinutes()).padStart(2, '0');
+    const second = String(now.getSeconds()).padStart(2, '0');
+    
     const id = uuidv4();
 
     const doc = {
       _id: id,
       ...data,
-      created_at: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
+      created_at: `${now.getFullYear()}-${month}-${day} ${hour}:${minute}:${second}`
     }
     
     const result = await collection.insertOne(doc);
@@ -109,10 +115,15 @@ const deleteOne = async (collectionName, id) => {
     const options = { upsert: false };
 
     const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hour = String(now.getHours()).padStart(2, '0');
+    const minute = String(now.getMinutes()).padStart(2, '0');
+    const second = String(now.getSeconds()).padStart(2, '0');
 
     const updateDoc = {
       $set: {
-        deleted_at: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
+        deleted_at: `${now.getFullYear()}-${month}-${day} ${hour}:${minute}:${second}`
       },
     };
 
@@ -154,11 +165,16 @@ const updateOne = async (collectionName, id, data) => {
     const options = { upsert: false };
 
     const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hour = String(now.getHours()).padStart(2, '0');
+    const minute = String(now.getMinutes()).padStart(2, '0');
+    const second = String(now.getSeconds()).padStart(2, '0');
 
     const updateDoc = {
       $set: {
         ...data,
-        updated_at: `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()} ${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`
+        updated_at: `${now.getFullYear()}-${month}-${day} ${hour}:${minute}:${second}`
       }
     }
 
