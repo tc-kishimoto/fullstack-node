@@ -5,6 +5,7 @@ const mongo = require('../db/mongo')
 const dailyExcel = require('../excel/daily2')
 require('dotenv').config()
 
+const collectionName = 'daily';
 
 const router = express.Router()
 
@@ -16,7 +17,7 @@ router.route('/:userId/:year/:month')
     month: Number(req.params.month),
     deleted_at: { $exists: false},
   };
-  mongo.find('daily', filter)
+  mongo.find(collectionName, filter)
   .then(data => {
       res.json(data)
   });
@@ -31,7 +32,7 @@ router.route('/company/:companyId')
   const options = {
     sort: { date: -1},
   }
-  mongo.find('daily', filter, options)
+  mongo.find(collectionName, filter, options)
   .then(data => {
       res.json(data)
   });
@@ -46,7 +47,7 @@ router.route('/course/:couseId')
   const options = {
     sort: { date: -1},
   }
-  mongo.find('daily', filter, options)
+  mongo.find(collectionName, filter, options)
   .then(data => {
       res.json(data)
   });
@@ -61,7 +62,7 @@ router.route('/user/:userId')
   const options = {
     sort: { date: -1},
   }
-  mongo.find('daily', filter, options)
+  mongo.find(collectionName, filter, options)
   .then(data => {
       res.json(data)
   });
