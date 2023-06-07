@@ -29,10 +29,21 @@ router.route('/user/:userId')
 
 router.route('/course/:couseId')
 .get((req, res) => {
+  // console.log(req.query)
   const filter = {
     course_id: req.params.couseId,
     deleted_at: { $exists: false},
   };
+  if(req.query.categoryName) {
+    filter['category'] = { $regex: req.query.categoryName, $options: 'i' };
+  }
+  if(req.query.testName) {
+    filter['title'] = { $regex: req.query.testName, $options: 'i' };
+  }
+  if(req.query.attemptCount) {
+    filter['attempts'] = { $eq: parseInt(req.query.attemptCount, 10) };
+  }
+
   mongo.find(collectionName, filter)
   .then(data => {
     res.json(data)
