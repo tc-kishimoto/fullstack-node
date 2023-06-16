@@ -115,80 +115,150 @@ router.route('/:id')
     res.json(data)
   })
 })
-.put((req, res) => {
+// .put((req, res) => {
+//   // idがundefinedになっている時がある
+//   mongo.updateOne(collectionName, req.params.id, req.body)
+//   .then(() => {    
+//     mongo.findById(collectionName, req.params.id)
+//     .then(data => {
+//       // スコアの更新
+//       if(data != null) {
+//         let sumScore = 0;
+//         for(let i = 1; i <= data.quizCount; i++) {
+//           let score = 0
+//           const quiz = data[`quiz-${i}`]
+//           if ((quiz.type === 'radio' || quiz.type === 'text') && quiz.answer === quiz.user_answer) {
+//             score = quiz.maxScore;
+//           }
+//           if (quiz.type === 'checkbox' && quiz.user_answer !== null) {
+//             const answer1 = quiz.answer.sort();
+//             const answer2 = quiz.user_answer.sort();
+//             if(answer1.every((value, index) => value === answer2[index])) {
+//               score = quiz.maxScore;
+//             }
+//           }
+//           if (quiz.type === 'combination' && quiz.user_answer !== null) {
+//             const totalQuestions = quiz.answer.length;
+//             let correctAnswers = 0;
+          
+//             for (let i = 0; i < totalQuestions; i++) {
+//               if (quiz.user_answer.length < i) {
+//                 break;
+//               }
+//               if(quiz.user_answer[i] === undefined || quiz.user_answer[i] === null) {
+//                 continue;
+//               }
+//               const correctAnswerIndex = quiz.answer.findIndex(
+//                 (choice) =>
+//                   choice.question_id === quiz.user_answer[i].question_id && choice.choice_id === quiz.user_answer[i].choice_id
+//               );
+//               if (correctAnswerIndex !== -1) {
+//                 correctAnswers++;
+//               }
+//             }
+//             score = correctAnswers / totalQuestions;
+//             score = score < 1 ? score : 1;
+//             score = Math.round(score * quiz.maxScore * 100) / 100;
+//           }
+//           if (quiz.type === 'fill' && quiz.user_answer !== null) {
+//             const totalQuestions = quiz.answer.length;
+//             let correctAnswers = 0;
+          
+//             for (let i = 0; i < totalQuestions; i++) {
+//               const key = Object.keys(quiz.answer[i])[0]
+//               const target = quiz.user_answer.find(e => e !== null && Object.keys(e)[0] === key)
+//               if(target !== undefined && target[key] === quiz.answer[i][key]) {
+//                 correctAnswers++;
+//               }
+//             }
+//             score = correctAnswers / totalQuestions;
+//             score = score < 1 ? score : 1;
+//             score = Math.round(score * quiz.maxScore * 100) / 100;
+//           }
+//           sumScore += score;
+//           const scoreData = { [`quiz-${i}.score`] : score }
+//           mongo.updateOne(collectionName, data._id, scoreData)
+//         }
+//         mongo.updateOne(collectionName, data._id, { score: sumScore})
+//         .then(() => {
+//           mongo.findById(collectionName, data._id)
+//           .then(data3 => {
+//             res.json(data3)
+//           })
+//         })
+//       } else {
+//         res.status(404)
+//       }
+//     })
+// })
+.put(async (req, res) => {
   // idがundefinedになっている時がある
-  mongo.updateOne(collectionName, req.params.id, req.body)
-  .then(() => {    
-    mongo.findById(collectionName, req.params.id)
-    .then(data => {
-      // スコアの更新
-      if(data != null) {
-        let sumScore = 0;
-        for(let i = 1; i <= data.quizCount; i++) {
-          let score = 0
-          const quiz = data[`quiz-${i}`]
-          if ((quiz.type === 'radio' || quiz.type === 'text') && quiz.answer === quiz.user_answer) {
-            score = quiz.maxScore;
-          }
-          if (quiz.type === 'checkbox' && quiz.user_answer !== null) {
-            const answer1 = quiz.answer.sort();
-            const answer2 = quiz.user_answer.sort();
-            if(answer1.every((value, index) => value === answer2[index])) {
-              score = quiz.maxScore;
-            }
-          }
-          if (quiz.type === 'combination' && quiz.user_answer !== null) {
-            const totalQuestions = quiz.answer.length;
-            let correctAnswers = 0;
-          
-            for (let i = 0; i < totalQuestions; i++) {
-              if (quiz.user_answer.length < i) {
-                break;
-              }
-              if(quiz.user_answer[i] === undefined || quiz.user_answer[i] === null) {
-                continue;
-              }
-              const correctAnswerIndex = quiz.answer.findIndex(
-                (choice) =>
-                  choice.question_id === quiz.user_answer[i].question_id && choice.choice_id === quiz.user_answer[i].choice_id
-              );
-              if (correctAnswerIndex !== -1) {
-                correctAnswers++;
-              }
-            }
-            score = correctAnswers / totalQuestions;
-            score = score < 1 ? score : 1;
-            score = Math.round(score * quiz.maxScore * 100) / 100;
-          }
-          if (quiz.type === 'fill' && quiz.user_answer !== null) {
-            const totalQuestions = quiz.answer.length;
-            let correctAnswers = 0;
-          
-            for (let i = 0; i < totalQuestions; i++) {
-              const key = Object.keys(quiz.answer[i])[0]
-              const target = quiz.user_answer.find(e => e !== null && Object.keys(e)[0] === key)
-              if(target !== undefined && target[key] === quiz.answer[i][key]) {
-                correctAnswers++;
-              }
-            }
-            score = correctAnswers / totalQuestions;
-            score = score < 1 ? score : 1;
-            score = Math.round(score * quiz.maxScore * 100) / 100;
-          }
-          sumScore += score;
-          const scoreData = { [`quiz-${i}.score`] : score }
-          mongo.updateOne(collectionName, data._id, scoreData)
-        }
-        mongo.updateOne(collectionName, data._id, { score: sumScore})
-        .then((data2) => {
-          res.json(data2)
-        })
-      } else {
-        res.status(404)
+  await mongo.updateOne(collectionName, req.params.id, req.body)
+  const data = await mongo.findById(collectionName, req.params.id)
+  // スコアの更新
+  if(data != null) {
+    let sumScore = 0;
+    for(let i = 1; i <= data.quizCount; i++) {
+      let score = 0
+      const quiz = data[`quiz-${i}`]
+      if ((quiz.type === 'radio' || quiz.type === 'text') && quiz.answer === quiz.user_answer) {
+        score = quiz.maxScore;
       }
-    })
-})
-  .catch(console.dir);
+      if (quiz.type === 'checkbox' && quiz.user_answer !== null) {
+        const answer1 = quiz.answer.sort();
+        const answer2 = quiz.user_answer.sort();
+        if(answer1.every((value, index) => value === answer2[index])) {
+          score = quiz.maxScore;
+        }
+      }
+      if (quiz.type === 'combination' && quiz.user_answer !== null) {
+        const totalQuestions = quiz.answer.length;
+        let correctAnswers = 0;
+      
+        for (let i = 0; i < totalQuestions; i++) {
+          if (quiz.user_answer.length < i) {
+            break;
+          }
+          if(quiz.user_answer[i] === undefined || quiz.user_answer[i] === null) {
+            continue;
+          }
+          const correctAnswerIndex = quiz.answer.findIndex(
+            (choice) =>
+              choice.question_id === quiz.user_answer[i].question_id && choice.choice_id === quiz.user_answer[i].choice_id
+          );
+          if (correctAnswerIndex !== -1) {
+            correctAnswers++;
+          }
+        }
+        score = correctAnswers / totalQuestions;
+        score = score < 1 ? score : 1;
+        score = Math.round(score * quiz.maxScore * 100) / 100;
+      }
+      if (quiz.type === 'fill' && quiz.user_answer !== null) {
+        const totalQuestions = quiz.answer.length;
+        let correctAnswers = 0;
+      
+        for (let i = 0; i < totalQuestions; i++) {
+          const key = Object.keys(quiz.answer[i])[0]
+          const target = quiz.user_answer.find(e => e !== null && Object.keys(e)[0] === key)
+          if(target !== undefined && target[key] === quiz.answer[i][key]) {
+            correctAnswers++;
+          }
+        }
+        score = correctAnswers / totalQuestions;
+        score = score < 1 ? score : 1;
+        score = Math.round(score * quiz.maxScore * 100) / 100;
+      }
+      sumScore += score;
+      const scoreData = { [`quiz-${i}.score`] : score }
+      await mongo.updateOne(collectionName, data._id, scoreData)
+    }
+    await mongo.updateOne(collectionName, data._id, { score: sumScore})
+    const result = await mongo.findById(collectionName, data._id)
+    res.json(result)
+  } else {
+    res.status(404)
+  }
 })
 
 module.exports = router
