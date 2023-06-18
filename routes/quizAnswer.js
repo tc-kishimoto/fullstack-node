@@ -79,27 +79,40 @@ router.route('/user/finish/:userId/:category/:title')
 })
 
 router.route('/score/:id/:index/:score')
-.put((req, res) => {
+// .put((req, res) => {
+//   const data = { [`quiz-${req.params.index}.score`] : Number(req.params.score) }
+//   mongo.updateOne(collectionName, req.params.id, data)
+//   .then(() => {
+//     // 全体のスコアを更新する
+//     mongo.findById(collectionName, req.params.id)
+//     .then(data => {
+//       // res.json(data)
+//       let sumScore = 0;
+//       for(let i = 1; i <= data.quizCount; i++) {
+//         sumScore += data[`quiz-${i}`].score;
+//       }
+//       const scoreData = { score: sumScore }
+//       mongo.updateOne(collectionName, req.params.id, scoreData)
+//       .then(() => {
+//         res.status(200)
+//       }).catch(() => {
+//         res.status(404)
+//       })
+//     })
+//   })
+// })
+.put(async (req, res) => {
   const data = { [`quiz-${req.params.index}.score`] : Number(req.params.score) }
-  mongo.updateOne(collectionName, req.params.id, data)
-  .then(() => {
-    // 全体のスコアを更新する
-    mongo.findById(collectionName, req.params.id)
-    .then(data => {
-      // res.json(data)
-      let sumScore = 0;
-      for(let i = 1; i <= data.quizCount; i++) {
-        sumScore += data[`quiz-${i}`].score;
-      }
-      const scoreData = { score: sumScore }
-      mongo.updateOne(collectionName, req.params.id, scoreData)
-      .then(() => {
-        res.status(200)
-      }).catch(() => {
-        res.status(404)
-      })
-    })
-  })
+  await mongo.updateOne(collectionName, req.params.id, data)
+  // 全体のスコアを更新する
+  const quizResult = await mongo.findById(collectionName, req.params.id)
+  let sumScore = 0;
+  for(let i = 1; i <= quizResult.quizCount; i++) {
+    sumScore += quizResult[`quiz-${i}`].score;
+  }
+  const scoreData = { score: sumScore }
+  await mongo.updateOne(collectionName, req.params.id, scoreData)
+  res.json(scoreData)
 })
 
 router.route('/:id')
