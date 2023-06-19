@@ -21,7 +21,19 @@ router.route('/user/:userId')
     user_id: req.params.userId,
     deleted_at: { $exists: false},
   };
-  mongo.find(collectionName, filter)
+  const options = {
+    sort: { created_at: -1},
+  }
+  if(req.query.categoryName) {
+    filter['category'] = { $regex: req.query.categoryName, $options: 'i' };
+  }
+  if(req.query.testName) {
+    filter['title'] = { $regex: req.query.testName, $options: 'i' };
+  }
+  if(req.query.attemptCount) {
+    filter['attempts'] = { $eq: parseInt(req.query.attemptCount, 10) };
+  }
+  mongo.find(collectionName, filter, options)
   .then(data => {
     res.json(data)
   })
@@ -34,6 +46,9 @@ router.route('/course/:couseId')
     course_id: req.params.couseId,
     deleted_at: { $exists: false},
   };
+  const options = {
+    sort: { created_at: -1},
+  }
   if(req.query.categoryName) {
     filter['category'] = { $regex: req.query.categoryName, $options: 'i' };
   }
@@ -44,7 +59,7 @@ router.route('/course/:couseId')
     filter['attempts'] = { $eq: parseInt(req.query.attemptCount, 10) };
   }
 
-  mongo.find(collectionName, filter)
+  mongo.find(collectionName, filter, options)
   .then(data => {
     res.json(data)
   })

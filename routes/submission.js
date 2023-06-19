@@ -67,7 +67,10 @@ router.route('/user/:userId')
     user_id: req.params.userId,
     deleted_at: { $exists: false},
   }
-  mongo.find(collectionName, filter)
+  const options = {
+    sort: { created_at: -1},
+  }
+  mongo.find(collectionName, filter, options)
   .then((data) => {
     res.json(data)
   })
@@ -80,7 +83,10 @@ router.route('/company/:companyId')
     company_id: req.params.companyId,
     deleted_at: { $exists: false},
   }
-  mongo.find(collectionName, filter)
+  const options = {
+    sort: { created_at: -1},
+  }
+  mongo.find(collectionName, filter, options)
   .then((data) => {
     res.json(data)
   })
@@ -93,7 +99,10 @@ router.route('/course/:courseId')
     course_id: req.params.courseId,
     deleted_at: { $exists: false},
   }
-  mongo.find(collectionName, filter)
+  const options = {
+    sort: { created_at: -1},
+  }
+  mongo.find(collectionName, filter, options)
   .then((data) => {
     res.json(data)
   })
